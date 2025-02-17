@@ -1,5 +1,5 @@
-cmake_minimum_required(VERSION 3.12)
-project(service_template CXX)
+cmake_minimum_required(VERSION 3.14)
+project(Route_Planning_Using_Swarm_Intelligence CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(DownloadUserver)
@@ -12,25 +12,29 @@ endif()
 
 userver_setup_environment()
 
-
-# Common sources
-add_library(${PROJECT_NAME}_objs OBJECT
-    src/hello.hpp
-    src/hello.cpp
-)
-target_link_libraries(${PROJECT_NAME}_objs PUBLIC userver::core)
+# Adding sub directories
+add_subdirectory(src/base)
+add_subdirectory(src/server)
+add_subdirectory(src/osrm_client)
+add_subdirectory(src/swarm_intelligence/ACO)
+add_subdirectory(src/swarm_intelligence/PSO)
+add_subdirectory(src/swarm_intelligence/util)
+add_subdirectory(proto)
 
 
 # The Service
 add_executable(${PROJECT_NAME} src/main.cpp)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_objs)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_server)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_SI_ACO)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_PSO)
+# target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_SI_util)
 
 
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest
     src/hello_test.cpp
 )
-target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_objs userver::utest)
+target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_server userver::utest)
 add_google_tests(${PROJECT_NAME}_unittest)
 
 
@@ -38,7 +42,7 @@ add_google_tests(${PROJECT_NAME}_unittest)
 add_executable(${PROJECT_NAME}_benchmark
     src/hello_benchmark.cpp
 )
-target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_objs userver::ubench)
+target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_server userver::ubench)
 add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 # Functional testing

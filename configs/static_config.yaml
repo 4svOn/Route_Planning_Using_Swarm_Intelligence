@@ -10,6 +10,7 @@ components_manager:
     default_task_processor: main-task-processor
 
     components:                       # Configuring components that were registered via component_list
+
         server:
             listener:                 # configuring the main listening socket...
                 port: $server-port            # ...to listen on this port and...
@@ -29,20 +30,23 @@ components_manager:
             defaults:
                 HTTP_CLIENT_CONNECTION_POOL_SIZE: 1000
 
-        testsuite-support: {}
+        # testsuite-support: {}
 
         http-client:
-            load-enabled: $is_testing
+            # load-enabled: $is_testing
             fs-task-processor: fs-task-processor
+            pool-statistics-disable: false
+            thread-name-prefix: http-client
+            user-agent: MyUserAgent/1.0
 
         dns-client:
             fs-task-processor: fs-task-processor
 
-        tests-control:
-            load-enabled: $is_testing
-            path: /tests/{action}
-            method: POST
-            task_processor: main-task-processor
+        # tests-control:
+        #     load-enabled: $is_testing
+        #     path: /tests/{action}
+        #     method: POST
+        #     task_processor: main-task-processor
         handler-ping:
             path: /ping
             method: GET
@@ -52,5 +56,5 @@ components_manager:
 
         handler-hello:                    # Finally! Our handler.
             path: /hello                  # Registering handler by URL '/hello'.
-            method: GET,POST              # It will only reply to GET (HEAD) and POST requests.
+            method: GET,POST,OPTIONS              # It will only reply to GET (HEAD) and POST requests.
             task_processor: main-task-processor  # Run it on CPU bound task processor

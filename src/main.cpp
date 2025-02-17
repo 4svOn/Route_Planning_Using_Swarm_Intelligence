@@ -6,15 +6,22 @@
 #include <userver/testsuite/testsuite_support.hpp>
 #include <userver/utils/daemon_run.hpp>
 
-#include "hello.hpp"
+#include "swarm_intelligence/ACO/ant.hpp"
+#include "swarm_intelligence/PSO/test.hpp"
+
+
+#include "server/hello.hpp"
 
 int main(int argc, char* argv[]) {
+  ACO::TEST("aboba");
+  PSO::TEST();
+
   auto component_list = userver::components::MinimalServerComponentList()
                             .Append<userver::server::handlers::Ping>()
-                            .Append<userver::components::TestsuiteSupport>()
+                            // .Append<userver::components::TestsuiteSupport>()
                             .Append<userver::components::HttpClient>()
-                            .Append<userver::clients::dns::Component>()
-                            .Append<userver::server::handlers::TestsControl>();
+                            .Append<userver::clients::dns::Component>();
+                            // .Append<userver::server::handlers::TestsControl>();
 
   service_template::AppendHello(component_list);
 

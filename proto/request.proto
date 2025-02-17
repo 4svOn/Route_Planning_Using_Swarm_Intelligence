@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package request_pb;
+
+import "markers.proto";
+
+message Request {
+  repeated common_pb.Marker markers = 1;
+}

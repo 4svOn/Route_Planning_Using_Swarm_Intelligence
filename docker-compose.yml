@@ -1,18 +1,18 @@
 version: "2.3"
 
 services:
-    service_template-container:
+    Route_Planning_Using_Swarm_Intelligence-container:
         image: ghcr.io/userver-framework/ubuntu-22.04-userver-pg:latest
         privileged: true
         network_mode: bridge
         environment:
           - PREFIX=${PREFIX:-~/.local}
-          - CCACHE_DIR=/service_template/.ccache
+          - CCACHE_DIR=/Route_Planning_Using_Swarm_Intelligence/.ccache
           - CORES_DIR=/cores
         volumes:
-          - .:/service_template:rw
+          - .:/Route_Planning_Using_Swarm_Intelligence:rw
         ports:
           - 8080:8080
-        working_dir: /service_template
+        working_dir: /Route_Planning_Using_Swarm_Intelligence
         entrypoint:
           - ./tests/run_as_user.sh

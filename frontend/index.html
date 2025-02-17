@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <!-- Image source: https://github.com/openlayers/openlayers -->
+  <link rel="icon" type="image/svg+xml" href="https://openlayers.org/theme/img/logo-dark.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Примеры OpenLayers</title>
+  <!-- Стили по умолчанию от OpenLayers -->
+  <link rel="stylesheet" href="/node_modules/ol/ol.css" />
+  <!-- Наши стили: сделаем карту во всю ширину страницы -->
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <!-- Контейнер для карты -->
+  <div id="map-container">
+    <div id="map"></div>
+    <div id="controls">
+      <button id="sendRequestBtn">Отправить запрос</button>
+      <p id="responseText"></p>
+    </div>
+  </div>
+
+  <!-- JavaScript код для инициализации карты -->
+  <script type="module" src="./index.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+  <!-- <script src="https://cdn.jsdelivr.net/npm/protobufjs/dist/protobuf.min.js"></script> -->
+
+</body>
+</html>

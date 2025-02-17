@@ -1,0 +1,51 @@
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+}
+
+/* Контейнер для кнопки и текстового поля */
+#controls {
+  position: absolute; /* Абсолютное позиционирование */
+  top: 10px; /* Отступ сверху */
+  right: 10px; /* Отступ слева */
+  z-index: 1000; /* Убедимся, что элементы поверх карты */
+  background: rgba(255, 255, 255, 0.8); /* Полупрозрачный фон */
+  padding: 10px;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Расстояние между элементами */
+}
+
+/* Стили для кнопки */
+#sendRequestBtn {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#custom-button:hover {
+  background-color: #0056b3;
+}
+
+/* Стили для текстового поля */
+#responseText {
+  width: 200px; /* Ширина текстового поля */
+  height: 300px; /* Высота текстового поля */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: none; /* Запрещаем изменение размера */
+}

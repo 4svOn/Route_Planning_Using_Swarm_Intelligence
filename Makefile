@@ -16,20 +16,20 @@ $(addsuffix /CMakeCache.txt, $(addprefix build-, $(PRESETS))): build-%/CMakeCach
 # Build using cmake
 .PHONY: $(addprefix build-, $(PRESETS))
 $(addprefix build-, $(PRESETS)): build-%: build-%/CMakeCache.txt
-	cmake --build build-$* -j $(NPROCS) --target service_template
+	cmake --build build-$* -j $(NPROCS) --target Route_Planning_Using_Swarm_Intelligence
 
 # Test
 .PHONY: $(addprefix test-, $(PRESETS))
 $(addprefix test-, $(PRESETS)): test-%: build-%
-	cmake --build build-$* -j $(NPROCS) --target service_template_unittest
-	cmake --build build-$* -j $(NPROCS) --target service_template_benchmark
+	cmake --build build-$* -j $(NPROCS) --target Route_Planning_Using_Swarm_Intelligence_unittest
+	cmake --build build-$* -j $(NPROCS) --target Route_Planning_Using_Swarm_Intelligence_benchmark
 	cd build-$* && ((test -t 1 && GTEST_COLOR=1 PYTEST_ADDOPTS="--color=yes" ctest -V) || ctest -V)
 	pycodestyle tests
 
 # Start the service (via testsuite service runner)
 .PHONY: $(addprefix start-, $(PRESETS))
 $(addprefix start-, $(PRESETS)): start-%:
-	cmake --build build-$* -v --target start-service_template
+	cmake --build build-$* -v --target start-Route_Planning_Using_Swarm_Intelligence
 
 # Cleanup data
 .PHONY: $(addprefix clean-, $(PRESETS))
@@ -48,7 +48,7 @@ dist-clean:
 # Install
 .PHONY: $(addprefix install-, $(PRESETS))
 $(addprefix install-, $(PRESETS)): install-%: build-%
-	cmake --install build-$* -v --component service_template
+	cmake --install build-$* -v --component Route_Planning_Using_Swarm_Intelligence
 
 .PHONY: install
 install: install-release
@@ -62,19 +62,19 @@ format:
 # Internal hidden targets that are used only in docker environment
 .PHONY: $(addprefix --in-docker-start-, $(PRESETS))
 $(addprefix --in-docker-start-, $(PRESETS)): --in-docker-start-%: install-%
-	/home/user/.local/bin/service_template \
-		--config /home/user/.local/etc/service_template/static_config.yaml \
-		--config_vars /home/user/.local/etc/service_template/config_vars.yaml
+	/home/user/.local/bin/Route_Planning_Using_Swarm_Intelligence \
+		--config /home/user/.local/etc/Route_Planning_Using_Swarm_Intelligence/static_config.yaml \
+		--config_vars /home/user/.local/etc/Route_Planning_Using_Swarm_Intelligence/config_vars.yaml
 
 # Build and run service in docker environment
 .PHONY: $(addprefix docker-start-, $(PRESETS))
 docker-start-debug docker-start-release: docker-start-%:
-	$(DOCKER_COMPOSE) run -p 8080:8080 --rm service_template-container make -- --in-docker-start-$*
+	$(DOCKER_COMPOSE) run -p 8080:8080 --rm Route_Planning_Using_Swarm_Intelligence-container make -- --in-docker-start-$*
 
 # Start specific target in docker environment
 .PHONY: $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)) $(addprefix docker-install-, $(PRESETS))
 $(addprefix docker-cmake-, $(PRESETS)) $(addprefix docker-build-, $(PRESETS)) $(addprefix docker-test-, $(PRESETS)) $(addprefix docker-clean-, $(PRESETS)) $(addprefix docker-install-, $(PRESETS)): docker-%:
-	$(DOCKER_COMPOSE) run --rm service_template-container make $*
+	$(DOCKER_COMPOSE) run --rm Route_Planning_Using_Swarm_Intelligence-container make $*
 
 # Stop docker container and cleanup data
 .PHONY: docker-clean-data
