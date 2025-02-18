@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package pb;
-
-import "common.proto";
-
-message Request {
-  repeated pb.Coordinate markers = 1;
-}

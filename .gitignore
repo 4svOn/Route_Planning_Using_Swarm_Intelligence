@@ -1,6 +1,6 @@
 # custom
-proto/cpp
-frontend/proto
+proto/cpp/
+frontend/proto/
 
 
 __pycache__
