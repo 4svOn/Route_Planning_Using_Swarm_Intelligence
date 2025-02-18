@@ -6,15 +6,27 @@
 
 namespace osrm {
 
-    class OSRMResponse {
+    class Response {
     public:
-        OSRMResponse() = default;
-        OSRMResponse(std::string&& body);
+        Response() = default;
+        Response(std::string&& body);
 
-        std::string GetCode() const;
+        const std::string& GetCode() const;
+
+    protected:
+        userver::formats::json::Value JsonResponse_;
 
     private:
         std::string Code_;
     };
 
+    class ResponseRoute : public Response {
+    public:
+        ResponseRoute() = default;
+        ResponseRoute(std::string&& body);
+
+        const std::string& GetPolyline() const;
+    private:
+        std::string Polyline_;
+    };
 }

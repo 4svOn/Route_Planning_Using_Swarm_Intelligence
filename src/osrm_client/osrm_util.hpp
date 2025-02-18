@@ -4,20 +4,20 @@
 #include <map>
 
 namespace osrm {
-    const std::string OSRM_API_DOMAIN = "http://router.project-osrm.org";
-    const std::string OSRM_API_VERSION = "v1";
+    const std::string API_DOMAIN = "http://router.project-osrm.org";
+    const std::string API_VERSION = "v1";
 
-    enum OSRMServiceEnum {
+    enum ServiceEnum {
         Route = 1,
         Table = 2
     };
 
-    enum OSRMProfileEnum {
+    enum ProfileEnum {
         Driving = 1,
         Walking = 2,
         Bicycling = 3
     };
 
-    std::string GetServiceName(OSRMServiceEnum service);
-    std::string GetProfileName(OSRMProfileEnum profile);
+    std::string GetServiceName(ServiceEnum service);
+    std::string GetProfileName(ProfileEnum profile);
 };

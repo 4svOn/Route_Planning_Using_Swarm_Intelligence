@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package common_pb;
+package pb;
 
-message Marker {
+message Coordinate {
   double longitude = 1;
   double latitude = 2;
 }

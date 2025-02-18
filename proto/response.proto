@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package osrm;
+package pb;
 
 
 message Response {
-  string code = 1;
+  string polyline = 1;
 }

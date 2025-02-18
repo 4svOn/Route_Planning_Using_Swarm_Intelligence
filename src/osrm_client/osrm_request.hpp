@@ -11,9 +11,10 @@
 
 namespace osrm {
 
-    class OSRMRequest {
+    class Request {
     public:
-        OSRMRequest() = default;
+        Request() = default;
+        Request(const base::Coordinates& coordinates);
 
         virtual std::string GetUrlFull() const = 0;
 
@@ -21,19 +22,18 @@ namespace osrm {
         std::string GetUrlBegin() const;
 
     private:
-        OSRMServiceEnum Service_ = Route;
-        OSRMProfileEnum Profile_ = Driving;
+        ServiceEnum Service_ = Route;
+        ProfileEnum Profile_ = Driving;
     private:
         base::Coordinates Coordinates_;
     };
 
-    class OSRMRequestRoute : public OSRMRequest {
+    class RequestRoute : public Request {
     public:
-        OSRMRequestRoute() = default;
+        RequestRoute() = default;
+        RequestRoute(const base::Coordinates& coordinates);
 
         std::string GetUrlFull() const override;
-
-        // void FillUserverRequest(userver::clients::http::Request& request) const;
 
     private:
         std::string Overview_ = "full";

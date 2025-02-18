@@ -14,7 +14,6 @@ file(MAKE_DIRECTORY "${PROTO_GEN_DIR}")
 
 # Ищем все .proto файлы
 file(GLOB PROTO_FILES "${PROTO_DIR}/*.proto")
-# set(PROTO_FILES markers.proto request.proto)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES}  PROTOC_OUT_DIR ${PROTO_GEN_DIR})
 # protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS ${PROTO_FILES})

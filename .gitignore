@@ -1,3 +1,8 @@
+# custom
+proto/cpp
+frontend/proto
+
+
 __pycache__
 build*/
 compile_commands.json

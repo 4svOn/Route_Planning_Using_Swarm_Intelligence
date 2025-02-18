@@ -8,6 +8,8 @@ import { Point } from 'ol/geom';
 import { Vector as VectorLayer } from 'ol/layer';
 import { Vector as VectorSource } from 'ol/source';
 import { Style, Icon } from 'ol/style';
+import polyline from "@mapbox/polyline";
+
 
 // import { MarkersList, Marker } from './markers.proto';
 
@@ -27,12 +29,17 @@ import protobuf from 'protobufjs';
 import axios from 'axios';
 
 // Загрузите .proto файлы
-const markers_root = await protobuf.load('./proto/markers.proto');
+const common_root = await protobuf.load('./proto/common.proto');
 const request_root = await protobuf.load('./proto/request.proto');
+const response_root = await protobuf.load('./proto/response.proto');
+
 
 // Получите типы сообщений
-const Marker = markers_root.lookupType('common_pb.Marker');
-const Request = request_root.lookupType('request_pb.Request');
+const Coordinate_pb = common_root.lookupType('pb.Coordinate');
+const Request_pb = request_root.lookupType('pb.Request');
+const Response_pb = response_root.lookupType('pb.Response');
+
+const SERVER_URL = 'http://localhost:8080/hello';
 
 // Создаём экземпляр карты
 const map = new Map({
@@ -50,53 +57,12 @@ const map = new Map({
   }),
 });
 
-// Обработчик клика по кнопке
-document.getElementById('sendRequestBtn').addEventListener('click', async () => {
-  const responseTextElement = document.getElementById('responseText');
-
-  // Получаем все маркеры из vectorSource
-  const features = vectorSource.getFeatures();
-
-  // Собираем координаты маркеров
-  const markersData = features.map((feature) => {
-    const coordinates = feature.getGeometry().getCoordinates();
-    const [longitude, latitude] = toLonLat(coordinates); // Преобразуем координаты, если нужно
-    return { longitude, latitude };
-  });
-
-  // Создаём запрос на сервер
-  const request = Request.create({
-    markers: markersData.map((marker) => Marker.create(marker))
-  });
-
-  try {
-    console.log(JSON.stringify(request.toJSON(), null, 2));
-    console.log(Request.encode(request).finish());
-    // Отправляем GET-запрос на сервер
-    const response = await axios.post(
-      'http://localhost:8082/hello',
-      Request.encode(request).finish(),
-      {
-        headers: {
-          'Content-Type': 'application/protobuf'
-        }
-      }
-    );
-
-    // Выводим ответ сервера на страницу
-    responseTextElement.textContent = `Ответ сервера: ${response.data}`;
-  } catch (error) {
-    // Обрабатываем ошибку
-    responseTextElement.textContent = `Ошибка: ${error.message}`;
-  }
-});
-
 // Создаем слой для маркеров
-const vectorSource = new VectorSource();
-const vectorLayer = new VectorLayer({
-    source: vectorSource
+const markersSource = new VectorSource();
+const markersLayer = new VectorLayer({
+    source: markersSource
 });
-map.addLayer(vectorLayer);
+map.addLayer(markersLayer);
 
 // Создаем попап
 // const popup = new Overlay({
@@ -115,6 +81,78 @@ const pinStyle = new Style({
     })
 });
 
+// Создаем слой для маршрута
+const routeSource = new VectorSource();
+const routeLayer = new ol.layer.Vector({
+  source: routeSource,
+  style: new ol.style.Style({
+    stroke: new ol.style.Stroke({
+      color: 'blue', // Цвет линии
+      width: 4,      // Толщина линии
+    }),
+  }),
+});
+
+// Добавляем слой маршрута на карту
+map.addLayer(routeLayer);
+
+// Обработчик клика по кнопке
+document.getElementById('sendRequestBtn').addEventListener('click', async () => {
+  const responseTextElement = document.getElementById('responseText');
+
+  // Получаем все маркеры из vectorSource
+  const features = markersSource.getFeatures();
+
+  // Собираем координаты маркеров
+  const markersData = features.map((feature) => {
+    const coordinates = feature.getGeometry().getCoordinates();
+    const [longitude, latitude] = toLonLat(coordinates); // Преобразуем координаты, если нужно
+    return { longitude, latitude };
+  });
+
+  // Создаём запрос на сервер
+  const request = Request_pb.create({
+    markers: markersData.map((marker) => Coordinate_pb.create(marker))
+  });
+
+  try {
+    console.log(JSON.stringify(request.toJSON(), null, 2));
+    console.log(Request_pb.encode(request).finish());
+    // Отправляем GET-запрос на сервер
+    const response = await axios.post(
+      SERVER_URL,
+      Request_pb.encode(request).finish(),
+      {
+        headers: {
+          'Content-Type': 'application/protobuf'
+        },
+        responseType: "arraybuffer", // Указываем, что ожидаем бинарные данные
+      }
+    );
+
+    // Выводим ответ сервера на страницу
+    responseTextElement.textContent = `Ответ сервера: ${response.data}`;
+    const binaryResponse = new Uint8Array(response.data);
+    const response_pb = Response_pb.decode(binaryResponse);
+    console.log(JSON.stringify(response_pb.toJSON(), null, 2));
+    const decodedCoordinates = polyline.decode(response_pb.polyline);
+    const routePoints = decodedCoordinates.map(coord => ol.proj.fromLonLat([coord[1], coord[0]]));
+
+    // Создаем линию (маршрут)
+    const routeFeature = new ol.Feature({
+      geometry: new ol.geom.LineString(routePoints),
+    });
+    routeSource.addFeature(routeFeature);
+
+    // Опционально: Увеличиваем масштаб карты, чтобы маршрут был виден целиком
+    const extent = routeFeature.getGeometry().getExtent();
+    map.getView().fit(extent, { padding: [50, 50, 50, 50] });
+  } catch (error) {
+    // Обрабатываем ошибку
+    responseTextElement.textContent = `Ошибка: ${error.message}`;
+  }
+});
+
 // Обработчик клика на карте
 map.on('click', (event) => {
     // Получаем координаты клика
@@ -126,7 +164,7 @@ map.on('click', (event) => {
 
     if (clickedFeature) {
       // Если маркер уже есть, удаляем его
-      vectorSource.removeFeature(clickedFeature);
+      markersSource.removeFeature(clickedFeature);
     } else {
       // Создаем маркер (пин)
       const pinFeature = new Feature({
@@ -138,7 +176,7 @@ map.on('click', (event) => {
       // vectorSource.clear();
 
       // Добавляем маркер на слой
-      vectorSource.addFeature(pinFeature);
+      markersSource.addFeature(pinFeature);
     }
 
     // Выводим координаты в консоль (опционально)

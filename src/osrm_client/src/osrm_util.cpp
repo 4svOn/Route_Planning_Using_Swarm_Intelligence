@@ -1,24 +1,24 @@
 #include "osrm_util.hpp"
 
 namespace osrm {
-    std::string GetServiceName(OSRMServiceEnum service) {
+    std::string GetServiceName(ServiceEnum service) {
         switch (service) {
-            case OSRMServiceEnum::Route:
+            case ServiceEnum::Route:
                 return "route";
-            case OSRMServiceEnum::Table:
+            case ServiceEnum::Table:
                 return "table";
             default:
                 return "";
         }
     }
 
-    std::string GetProfileName(OSRMProfileEnum profile) {
+    std::string GetProfileName(ProfileEnum profile) {
         switch (profile) {
-            case OSRMProfileEnum::Driving:
+            case ProfileEnum::Driving:
                 return "driving";
-            case OSRMProfileEnum::Walking:
+            case ProfileEnum::Walking:
                 return "walking";
-            case OSRMProfileEnum::Bicycling:
+            case ProfileEnum::Bicycling:
                 return "bicycling";
             default:
                 return "";

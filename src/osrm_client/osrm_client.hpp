@@ -8,14 +8,14 @@
 
 namespace osrm {
 
-    class OSRMClient {
+    class Client {
     public:
 
         static constexpr std::string_view kName = "osrm-client";
 
-        OSRMClient(userver::clients::http::Client& httpClient);
+        Client(userver::clients::http::Client& httpClient);
 
-        OSRMResponse GetRoute(const OSRMRequestRoute& request);
+        ResponseRoute MakeRouteRequest(const RequestRoute& request);
 
     private:
         userver::clients::http::Client& HttpClient_;

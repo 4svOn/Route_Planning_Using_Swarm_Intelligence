@@ -1,10 +1,15 @@
 #pragma once
 
+#include <proto/cpp/common.pb.h>
+
 #include <vector>
 #include <string>
 
 namespace base {
     struct Coordinate {
+        Coordinate() = default;
+        Coordinate(const pb::Coordinate& coordinate_pb);
+
         double Longitude;
         double Latitude;
     };
@@ -12,4 +17,6 @@ namespace base {
     using Coordinates = std::vector<Coordinate>;
 
     std::string ToString(const Coordinates& coordinates);
+
+    Coordinates FromProto(const google::protobuf::RepeatedPtrField<pb::Coordinate>& coordinates_pb);
 };

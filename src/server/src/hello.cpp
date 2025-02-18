@@ -15,6 +15,9 @@
 #include <swarm_intelligence/ACO/ant.hpp>
 
 #include "proto/cpp/request.pb.h"
+#include "proto/cpp/response.pb.h"
+
+#include <sstream>
 
 namespace service_template {
 
@@ -36,21 +39,27 @@ namespace {
             const userver::server::http::HttpRequest &request,
             userver::server::request::RequestContext &) const override {
             auto& response = request.GetHttpResponse();
-            response.SetContentType("text/plain");
+            response.SetContentType("application/protobuf");
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Origin"}, "*");
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Methods"}, "GET, POST, PUT, DELETE, OPTIONS");
             response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type");
 
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
-                osrm::OSRMClient osrmClient{HttpClient_.GetHttpClient()};
-                request_pb::Request requestBodyPb;
+                osrm::Client osrmClient{HttpClient_.GetHttpClient()};
+                pb::Request requestBodyPb;
                 requestBodyPb.ParseFromString(request.RequestBody());
                 LOG_INFO() << requestBodyPb.DebugString();
 
-                osrm::OSRMRequestRoute osrmRequestRoute;
-                auto osrmResponse = osrmClient.GetRoute(osrmRequestRoute);
-                LOG_INFO() << "OSRM RESPONSE: " << osrmResponse.GetCode();
-                return requestBodyPb.DebugString();
+                auto coords = base::FromProto(requestBodyPb.markers());
+                osrm::RequestRoute osrmRequestRoute{coords};
+                auto osrmResponse = osrmClient.MakeRouteRequest(osrmRequestRoute);
+
+                pb::Response response_pb;
+                response_pb.set_polyline(osrmResponse.GetPolyline());
+                LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
+                std::string res;
+                response_pb.SerializeToString(&res);
+                return res;
             }
             if (request.GetMethod() == userver::server::http::HttpMethod::kGet) {
                 return service_template::SayHelloTo(request.GetArg("name"));
