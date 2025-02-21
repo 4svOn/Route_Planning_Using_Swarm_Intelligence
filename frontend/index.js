@@ -57,6 +57,12 @@ const map = new Map({
   }),
 });
 
+axios.defaults.headers = {
+  'Cache-Control': 'no-cache',
+  'Pragma': 'no-cache',
+  'Expires': '0',
+};
+
 // Создаем слой для маркеров
 const markersSource = new VectorSource();
 const markersLayer = new VectorLayer({
@@ -102,6 +108,7 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
 
   // Получаем все маркеры из vectorSource
   const features = markersSource.getFeatures();
+  console.log(features);
 
   // Собираем координаты маркеров
   const markersData = features.map((feature) => {
@@ -110,21 +117,30 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
     return { longitude, latitude };
   });
 
+  console.log("markersData:", markersData); // Логируем данные маркеров
+
+
   // Создаём запрос на сервер
   const request = Request_pb.create({
-    markers: markersData.map((marker) => Coordinate_pb.create(marker))
+    markers: markersData.map((marker) => Coordinate_pb.create(marker)),
+    timestamp: Date.now()
   });
+
+  const requestBody = Request_pb.encode(request).finish();
 
   try {
     console.log(JSON.stringify(request.toJSON(), null, 2));
-    console.log(Request_pb.encode(request).finish());
+    console.log(requestBody);
     // Отправляем GET-запрос на сервер
     const response = await axios.post(
-      SERVER_URL,
-      Request_pb.encode(request).finish(),
+      SERVER_URL + "?n=" + features.length + "&timestamp=" + Date.now(),
+      requestBody,
       {
         headers: {
-          'Content-Type': 'application/protobuf'
+          'Content-Type': 'application/octet-stream',
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+          'Expires': '0',
         },
         responseType: "arraybuffer", // Указываем, что ожидаем бинарные данные
       }
@@ -142,6 +158,7 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
     const routeFeature = new ol.Feature({
       geometry: new ol.geom.LineString(routePoints),
     });
+    routeSource.clear();
     routeSource.addFeature(routeFeature);
 
     // Опционально: Увеличиваем масштаб карты, чтобы маршрут был виден целиком

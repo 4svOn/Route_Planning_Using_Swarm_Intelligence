@@ -18,6 +18,7 @@
 #include "proto/cpp/response.pb.h"
 
 #include <sstream>
+#include <string>
 
 namespace service_template {
 
@@ -29,20 +30,24 @@ namespace {
 
         using HttpHandlerBase::HttpHandlerBase;
 
-        Hello(const userver::components::ComponentConfig &config,
-              const userver::components::ComponentContext &component_context)
+        Hello(const userver::components::ComponentConfig& config,
+              const userver::components::ComponentContext& component_context)
             : HttpHandlerBase(config, component_context)
             , HttpClient_(component_context.FindComponent<userver::components::HttpClient>("http-client"))
         {}
 
         std::string HandleRequestThrow(
-            const userver::server::http::HttpRequest &request,
-            userver::server::request::RequestContext &) const override {
+            const userver::server::http::HttpRequest& request,
+            userver::server::request::RequestContext&) const override {
             auto& response = request.GetHttpResponse();
-            response.SetContentType("application/protobuf");
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Origin"}, "*");
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Methods"}, "GET, POST, PUT, DELETE, OPTIONS");
-            response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type");
+            response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type, Cache-Control, Pragma, Expires");
+            response.SetContentType("application/protobuf");
+
+            LOG_INFO() << request.GetUrl();
+            LOG_INFO() << request.RequestBody();
+            // LOG_INFO() << request_context.GetUserData<std::string>();
 
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
                 osrm::Client osrmClient{HttpClient_.GetHttpClient()};
@@ -83,6 +88,11 @@ std::string SayHelloTo(std::string_view name) {
 
 void AppendHello(userver::components::ComponentList &component_list) {
     component_list.Append<Hello>();
+
+    // std::string q = "ChIJ9mjCEIPBQkAROAWZTYneS0AKEgm6kK2eaMxCQBEs2eyP8NpLQBC2osGG0jIAChIJ9mjCEIPBQkAROAWZTYneS0AKEgm6kK2eaMxCQBEs2eyP8NpLQAoSCcJvjlSdyUJAEai7EpXU3EtAEIu8wYbSMg";
+    // pb::Request requestBodyPb;
+    // requestBodyPb.ParseFromString(q);
+    // std::cout << "ABOBA: " << requestBodyPb.DebugString();
 }
 
 } // namespace service_template
