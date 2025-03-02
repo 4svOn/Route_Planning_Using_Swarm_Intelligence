@@ -43,7 +43,7 @@ namespace {
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Origin"}, "*");
             response.SetHeader(userver::http::headers::PredefinedHeader{"Access-Control-Allow-Methods"}, "GET, POST, PUT, DELETE, OPTIONS");
             response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type, Cache-Control, Pragma, Expires");
-            response.SetContentType("application/protobuf");
+            response.SetContentType("application/octet-stream");
 
             LOG_INFO() << request.GetUrl();
             LOG_INFO() << request.RequestBody();

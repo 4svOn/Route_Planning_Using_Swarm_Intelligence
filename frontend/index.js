@@ -26,7 +26,10 @@ import polyline from "@mapbox/polyline";
 // const Marker = root.lookupType('Marker');
 
 import protobuf from 'protobufjs';
-import axios from 'axios';
+// import axios from 'axios';
+// import superagent from 'superagent';
+// import ky from 'ky';
+
 
 // Загрузите .proto файлы
 const common_root = await protobuf.load('./proto/common.proto');
@@ -56,12 +59,6 @@ const map = new Map({
     zoom: 10,
   }),
 });
-
-axios.defaults.headers = {
-  'Cache-Control': 'no-cache',
-  'Pragma': 'no-cache',
-  'Expires': '0',
-};
 
 // Создаем слой для маркеров
 const markersSource = new VectorSource();
@@ -132,23 +129,24 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
     console.log(JSON.stringify(request.toJSON(), null, 2));
     console.log(requestBody);
     // Отправляем GET-запрос на сервер
-    const response = await axios.post(
-      SERVER_URL + "?n=" + features.length + "&timestamp=" + Date.now(),
-      requestBody,
-      {
-        headers: {
-          'Content-Type': 'application/octet-stream',
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache',
-          'Expires': '0',
-        },
-        responseType: "arraybuffer", // Указываем, что ожидаем бинарные данные
-      }
-    );
-
+    const url = SERVER_URL + "?n=" + features.length + "&timestamp=" + Date.now();
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/octet-stream',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+      body: requestBody, // Бинарные данные
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const arrayBuffer = await response.arrayBuffer(); // Получаем ArrayBuffer
     // Выводим ответ сервера на страницу
-    responseTextElement.textContent = `Ответ сервера: ${response.data}`;
-    const binaryResponse = new Uint8Array(response.data);
+    responseTextElement.textContent = `Ответ сервера: ${arrayBuffer}`;
+    const binaryResponse = new Uint8Array(arrayBuffer);
     const response_pb = Response_pb.decode(binaryResponse);
     console.log(JSON.stringify(response_pb.toJSON(), null, 2));
     const decodedCoordinates = polyline.decode(response_pb.polyline);

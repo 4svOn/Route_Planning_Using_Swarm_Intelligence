@@ -10,8 +10,10 @@
     "@mapbox/polyline": "^1.2.1",
     "axios": "^1.7.9",
     "google-protobuf": "^3.21.4",
+    "ky": "^1.7.5",
     "ol": "^8.2.0",
     "protobufjs": "^7.4.0",
+    "superagent": "^10.1.1",
     "vite": "^6.1.0",
     "vite-plugin-proto": "^1.0.0"
   }
