@@ -1,6 +1,7 @@
 # custom
 proto/cpp/
 frontend/proto/
+frontend/package-lock.json
 
 
 __pycache__
