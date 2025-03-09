@@ -4,7 +4,7 @@ set(LIB_NAME ${PROJECT_NAME}_server)
 
 add_library(${LIB_NAME} STATIC
     # include/util.hpp
-    src/hello.cpp
+    src/main_handler.cpp
 )
 
 target_include_directories(${LIB_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

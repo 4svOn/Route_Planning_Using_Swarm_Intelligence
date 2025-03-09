@@ -1,6 +1,6 @@
 #pragma once
 
-#include "osrm_util.hpp"
+#include "util.hpp"
 
 #include <base/coordinates.hpp>
 
@@ -14,7 +14,7 @@ namespace osrm {
     class Request {
     public:
         Request() = default;
-        Request(const base::Coordinates& coordinates);
+        Request(const base::Coordinates& coordinates, ServiceEnum service, ProfileEnum profile);
 
         virtual std::string GetUrlFull() const = 0;
 
@@ -22,10 +22,9 @@ namespace osrm {
         std::string GetUrlBegin() const;
 
     private:
-        ServiceEnum Service_ = Route;
-        ProfileEnum Profile_ = Driving;
-    private:
         base::Coordinates Coordinates_;
+        ServiceEnum Service_;
+        ProfileEnum Profile_;
     };
 
     class RequestRoute : public Request {
@@ -38,5 +37,16 @@ namespace osrm {
     private:
         std::string Overview_ = "full";
     };
+
+    class RequestTable : public Request {
+        public:
+            RequestTable() = default;
+            RequestTable(const base::Coordinates& coordinates);
+
+            std::string GetUrlFull() const override;
+
+        private:
+            std::string Annotation_ = "duration,distance";
+        };
 
 }

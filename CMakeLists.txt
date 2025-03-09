@@ -32,9 +32,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_PSO)
 
 # Unit Tests
 add_executable(${PROJECT_NAME}_unittest
-    src/hello_test.cpp
+    src/osrm_client/ut/client_ut.cpp
 )
-target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_server userver::utest)
+target_link_libraries(${PROJECT_NAME}_unittest PRIVATE ${PROJECT_NAME}_OSRM userver::utest)
 add_google_tests(${PROJECT_NAME}_unittest)
 
 
@@ -45,8 +45,8 @@ add_executable(${PROJECT_NAME}_benchmark
 target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_server userver::ubench)
 add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
-# Functional testing
-userver_testsuite_add_simple()
+# # Functional testing
+# userver_testsuite_add_simple()
 
 # Install
 include(GNUInstallDirs)

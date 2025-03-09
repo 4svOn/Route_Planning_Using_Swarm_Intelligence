@@ -1,4 +1,4 @@
-#include "osrm_util.hpp"
+#include "util.hpp"
 
 namespace osrm {
     std::string GetServiceName(ServiceEnum service) {

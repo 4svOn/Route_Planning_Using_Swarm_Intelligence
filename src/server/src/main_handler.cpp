@@ -1,16 +1,18 @@
-#include "hello.hpp"
+#include "main_handler.hpp"
 
 #include <fmt/format.h>
 
 #include <userver/components/component_context.hpp>
 #include <userver/clients/http/component.hpp>
 #include <userver/server/handlers/http_handler_base.hpp>
+#include <userver/server/handlers/exceptions.hpp>
 #include <userver/server/http/http_method.hpp>
 #include <userver/http/common_headers.hpp>
 #include <userver/http/predefined_header.hpp>
 
-#include <osrm_client/osrm_client.hpp>
-#include <osrm_client/osrm_request.hpp>
+
+#include <osrm_client/client.hpp>
+#include <osrm_client/request.hpp>
 
 #include <swarm_intelligence/ACO/ant.hpp>
 
@@ -20,17 +22,17 @@
 #include <sstream>
 #include <string>
 
-namespace service_template {
+namespace main_handler {
 
 namespace {
 
-    class Hello final : public userver::server::handlers::HttpHandlerBase {
+    class MainHandler final : public userver::server::handlers::HttpHandlerBase {
     public:
         static constexpr std::string_view kName = "handler-hello";
 
         using HttpHandlerBase::HttpHandlerBase;
 
-        Hello(const userver::components::ComponentConfig& config,
+        MainHandler(const userver::components::ComponentConfig& config,
               const userver::components::ComponentContext& component_context)
             : HttpHandlerBase(config, component_context)
             , HttpClient_(component_context.FindComponent<userver::components::HttpClient>("http-client"))
@@ -45,8 +47,8 @@ namespace {
             response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type, Cache-Control, Pragma, Expires");
             response.SetContentType("application/octet-stream");
 
-            LOG_INFO() << request.GetUrl();
-            LOG_INFO() << request.RequestBody();
+            // LOG_INFO() << request.GetUrl();
+            // LOG_INFO() << request.RequestBody();
             // LOG_INFO() << request_context.GetUserData<std::string>();
 
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
@@ -58,16 +60,17 @@ namespace {
                 auto coords = base::FromProto(requestBodyPb.markers());
                 osrm::RequestRoute osrmRequestRoute{coords};
                 auto osrmResponse = osrmClient.MakeRouteRequest(osrmRequestRoute);
+                if (!osrmResponse) {
+                    LOG_INFO() << "OSRM request failed";
+                    throw userver::server::handlers::InternalServerError();
+                }
 
                 pb::Response response_pb;
-                response_pb.set_polyline(osrmResponse.GetPolyline());
-                LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
+                response_pb.set_polyline(osrmResponse->GetPolyline());
+                // LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
                 std::string res;
                 response_pb.SerializeToString(&res);
                 return res;
-            }
-            if (request.GetMethod() == userver::server::http::HttpMethod::kGet) {
-                return service_template::SayHelloTo(request.GetArg("name"));
             }
             return "";
         }
@@ -83,11 +86,11 @@ std::string SayHelloTo(std::string_view name) {
     name = "unknown user";
     }
 
-    return fmt::format("Hello, {}!\n", name);
+    return fmt::format("MainHandler, {}!\n", name);
 }
 
-void AppendHello(userver::components::ComponentList &component_list) {
-    component_list.Append<Hello>();
+void AppendMainHandler(userver::components::ComponentList &component_list) {
+    component_list.Append<MainHandler>();
 
     // std::string q = "ChIJ9mjCEIPBQkAROAWZTYneS0AKEgm6kK2eaMxCQBEs2eyP8NpLQBC2osGG0jIAChIJ9mjCEIPBQkAROAWZTYneS0AKEgm6kK2eaMxCQBEs2eyP8NpLQAoSCcJvjlSdyUJAEai7EpXU3EtAEIu8wYbSMg";
     // pb::Request requestBodyPb;
@@ -95,4 +98,4 @@ void AppendHello(userver::components::ComponentList &component_list) {
     // std::cout << "ABOBA: " << requestBodyPb.DebugString();
 }
 
-} // namespace service_template
+} // namespace main_handler

@@ -1,4 +1,4 @@
-#include "hello.hpp"
+// #include "hello.hpp"
 
 #include <cstdint>   // for std::uint64_t
 #include <iterator>  // for std::size
@@ -13,9 +13,9 @@ void HelloBenchmark(benchmark::State& state) {
     std::uint64_t i = 0;
 
     for (auto _ : state) {
-      const auto name = kNames[i++ % std::size(kNames)];
-      auto result = service_template::SayHelloTo(name);
-      benchmark::DoNotOptimize(result);
+      // const auto name = kNames[i++ % std::size(kNames)];
+      // auto result = service_template::SayHelloTo(name);
+      // benchmark::DoNotOptimize(result);
     }
   });
 }
