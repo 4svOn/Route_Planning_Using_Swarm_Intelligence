@@ -4,7 +4,13 @@ package pb;
 
 import "common.proto";
 
+message Customer {
+  pb.Coordinate coordinate = 1;
+  int64 demand = 2;
+}
+
 message Request {
-  repeated pb.Coordinate markers = 1;
-  int64 timestamp = 2;
+  Customer depot = 1;
+  repeated Customer customers = 2;
+  int64 timestamp = 777;
 }

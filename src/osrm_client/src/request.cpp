@@ -20,6 +20,10 @@ namespace osrm {
         url += "/" + base::ToString(Coordinates_);
         return url;
     }
+
+    uint64_t Request::GetSize() const {
+        return Coordinates_.size();
+    }
     // -----------------------------------------------------------------------------
 
     // RequestRoute ----------------------------------------------------------------
@@ -39,14 +43,14 @@ namespace osrm {
     // -----------------------------------------------------------------------------
 
     // RequestTable ----------------------------------------------------------------
-    RequestTable::RequestTable(const base::Coordinates& coordinates)
-        : Request(coordinates, Table, Driving)
+    RequestTable::RequestTable(const SI::CVRP::TNodesWithCoordinates& nodes)
+        : Request(nodes.Coordinates(), Table, Driving)
     {
     }
 
     std::string RequestTable::GetUrlFull() const {
         userver::http::Args args;
-        args["annotation"] = Annotation_;
+        args["annotations"] = Annotations_;
 
         auto url = userver::http::MakeUrl(Request::GetUrlBegin(), args);
         // return userver::http::UrlEncode(url);

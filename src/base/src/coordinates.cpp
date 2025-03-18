@@ -23,8 +23,4 @@ namespace base {
         }
         return res;
     }
-
-    Coordinates FromProto(const google::protobuf::RepeatedPtrField<pb::Coordinate>& coordinates_pb) {
-        return Coordinates{coordinates_pb.begin(), coordinates_pb.end()};
-    }
 }

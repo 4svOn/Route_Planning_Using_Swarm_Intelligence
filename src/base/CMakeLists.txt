@@ -5,6 +5,8 @@ set(LIB_NAME ${PROJECT_NAME}_base)
 add_library(${LIB_NAME} STATIC
     # include/util.hpp
     src/coordinates.cpp
+    src/random.cpp
+    src/ranges.cpp
 )
 
 target_include_directories(${LIB_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

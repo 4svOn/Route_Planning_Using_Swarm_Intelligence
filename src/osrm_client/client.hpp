@@ -27,7 +27,6 @@ namespace osrm {
             LOG_INFO() << "OSRM request: " << request.GetUrl();
             try {
                 auto response = request.perform();
-                // LOG_INFO() << (response->IsOk() ? "OSRM request was OK" : "OSRM request failed");
                 // LOG_INFO() << "OSRM response: " << response->body();
                 return TResponse{std::move(*response).body(), osrmRequest};  // no copying
             } catch (const userver::clients::http::TimeoutException&) {

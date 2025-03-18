@@ -2,10 +2,11 @@
 
 #include "util.hpp"
 
-#include <base/coordinates.hpp>
+#include <swarm_intelligence/common/node.hpp>
 
 #include <userver/clients/http/request.hpp>
 
+#include <cstdint>
 #include <vector>
 #include <string>
 
@@ -17,6 +18,8 @@ namespace osrm {
         Request(const base::Coordinates& coordinates, ServiceEnum service, ProfileEnum profile);
 
         virtual std::string GetUrlFull() const = 0;
+
+        uint64_t GetSize() const;
 
     protected:
         std::string GetUrlBegin() const;
@@ -41,12 +44,12 @@ namespace osrm {
     class RequestTable : public Request {
         public:
             RequestTable() = default;
-            RequestTable(const base::Coordinates& coordinates);
+            RequestTable(const SI::CVRP::TNodesWithCoordinates& nodes);
 
             std::string GetUrlFull() const override;
 
         private:
-            std::string Annotation_ = "duration,distance";
+            std::string Annotations_ = "duration,distance";
         };
 
 }

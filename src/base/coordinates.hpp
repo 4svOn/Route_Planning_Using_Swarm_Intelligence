@@ -17,6 +17,4 @@ namespace base {
     using Coordinates = std::vector<Coordinate>;
 
     std::string ToString(const Coordinates& coordinates);
-
-    Coordinates FromProto(const google::protobuf::RepeatedPtrField<pb::Coordinate>& coordinates_pb);
 };

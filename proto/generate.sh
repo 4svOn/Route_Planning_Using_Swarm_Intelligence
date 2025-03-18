@@ -15,4 +15,4 @@ for proto_file in *.proto; do
   protoc --cpp_out=cpp "$proto_file"
 done
 
-echo "Генерация завершена. JavaScript файлы находятся в папке 'js', C++ файлы — в папке 'cpp'."
+echo "Генерация завершена. JavaScript файлы находятся в папке '../frontend/proto', C++ файлы — в папке 'cpp'."

@@ -3,9 +3,13 @@
 #include "util.hpp"
 #include "request.hpp"
 
+#include <swarm_intelligence/common/types.hpp>
+
 #include <userver/formats/json/value.hpp>
 
 #include <string>
+
+using namespace SI;
 
 namespace osrm {
 
@@ -14,13 +18,16 @@ namespace osrm {
         // Response() = default;
         Response(std::string&& body);
 
-        const std::string& GetCode() const;
+        std::string GetLogString() const;
+
+        bool IsOk() const;
 
     protected:
         userver::formats::json::Value JsonResponse_;
 
     private:
         std::string Code_;
+        std::string Message_;
     };
 
     class ResponseRoute : public Response {
@@ -40,13 +47,16 @@ namespace osrm {
         // ResponseTable() = default;
         ResponseTable(std::string&& body, const RequestTable& request);
 
-        const DurationTable& GetDurationTable() const;
-        const DistanceTable& GetDistanceTable() const;
+        const RequestTable& GetRequest() const;
+
+        const uint64_t& GetSize() const;
+        const TDurationTable& GetDurationTable() const;
+        const TDistanceTable& GetDistanceTable() const;
     private:
         const RequestTable& Request_;
 
         uint64_t Size_;
-        DurationTable DurationTable_;
-        DistanceTable DistanceTable_;
+        TDurationTable DurationTable_;
+        TDistanceTable DistanceTable_;
     };
 }

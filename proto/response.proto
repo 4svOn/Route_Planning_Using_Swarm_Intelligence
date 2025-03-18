@@ -2,7 +2,14 @@ syntax = "proto3";
 
 package pb;
 
+// import "common.proto";
+
+message Route {
+  // repeated pb.Coordinate points = 1;
+  string polyline = 1;
+}
 
 message Response {
-  string polyline = 1;
+  repeated Route routes = 1;
+  int64 total_distance = 2;
 }

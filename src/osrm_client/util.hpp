@@ -9,9 +9,6 @@ namespace osrm {
     const std::string API_DOMAIN = "http://router.project-osrm.org";
     const std::string API_VERSION = "v1";
 
-    using DurationTable = std::vector<std::vector<uint64_t>>;
-    using DistanceTable = std::vector<std::vector<uint64_t>>;
-
     enum ServiceEnum {
         Route = 1,
         Table = 2

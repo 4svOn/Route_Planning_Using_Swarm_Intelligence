@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(Route_Planning_Using_Swarm_Intelligence CXX)
 
+# set(CMAKE_CXX_STANDARD 20)
+
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 include(DownloadUserver)
 
@@ -18,7 +20,7 @@ add_subdirectory(src/server)
 add_subdirectory(src/osrm_client)
 add_subdirectory(src/swarm_intelligence/ACO)
 add_subdirectory(src/swarm_intelligence/PSO)
-add_subdirectory(src/swarm_intelligence/util)
+add_subdirectory(src/swarm_intelligence/common)
 add_subdirectory(proto)
 
 
@@ -46,7 +48,7 @@ target_link_libraries(${PROJECT_NAME}_benchmark PRIVATE ${PROJECT_NAME}_server u
 add_google_benchmark_tests(${PROJECT_NAME}_benchmark)
 
 # # Functional testing
-# userver_testsuite_add_simple()
+userver_testsuite_add_simple()
 
 # Install
 include(GNUInstallDirs)
