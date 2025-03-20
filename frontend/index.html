@@ -5,7 +5,7 @@
   <!-- Image source: https://github.com/openlayers/openlayers -->
   <link rel="icon" type="image/svg+xml" href="https://openlayers.org/theme/img/logo-dark.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Примеры OpenLayers</title>
+  <title>Route Planning Using Swarm Intelligence</title>
   <!-- Стили по умолчанию от OpenLayers -->
   <link rel="stylesheet" href="/node_modules/ol/ol.css" />
   <!-- Наши стили: сделаем карту во всю ширину страницы -->
@@ -19,18 +19,31 @@
       <label class="toggle-switch-customer-depot">
         <input type="checkbox" id="toggle-button-customer-depot">
         <span class="slider">
-          <span class="text on">Покупатель</span>
-          <span class="text off">Склад</span>
+          <span class="text on">Customers</span>
+          <span class="text off">Depot</span>
         </span>
       </label>
-      <button id="sendRequestBtn">Отправить запрос</button>
-      <p id="responseText"></p>
+      <button id="sendRequestBtn" class="controls-button">Process calculations</button>
+      <!-- <p id="responseText"></p> -->
+      <div class="input-group">
+        <label for="input1">Vehicle capacity:</label>
+        <input type="text" id="input-vehicle-capacity" inputmode="numeric" pattern="\d*" placeholder="Input a number" value="100">
+      </div>
+      <div class="input-group">
+        <label for="input2">Customers demand:</label>
+        <input type="text" id="input-customers-demand" inputmode="numeric" pattern="\d*" placeholder="Input a number" value="50">
+      </div>
+      <button id="clearRoutesBtn" class="controls-button">Clear routes</button>
     </div>
   </div>
 
   <div id="error-message" class="error-message">
     <span id="error-text"></span>
     <span class="close-button" onclick="hideError()">×</span>
+  </div>
+
+  <div id="popup" class="popup">
+    <span id="popup-total-distance">Total distance: </span>
   </div>
 
   <!-- JavaScript код для инициализации карты -->
@@ -44,6 +57,13 @@
       const errorMessage = document.getElementById('error-message');
       errorMessage.classList.remove('show');
     }
+
+    document.querySelectorAll('input[type="text"]').forEach(input => {
+      input.addEventListener('input', function() {
+        // Удаляем все символы, кроме цифр
+        this.value = this.value.replace(/[^0-9]/g, '');
+      });
+    });
   </script>
 
   <!-- <script src="https://cdn.jsdelivr.net/npm/protobufjs/dist/protobuf.min.js"></script> -->

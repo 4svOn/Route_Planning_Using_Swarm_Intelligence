@@ -27,7 +27,7 @@ body {
 }
 
 /* Стили для кнопки */
-#sendRequestBtn {
+.controls-button {
   padding: 10px 20px;
   background-color: #007bff;
   color: white;
@@ -40,21 +40,11 @@ body {
   background-color: #0056b3;
 }
 
-/* Стили для текстового поля */
-#responseText {
-  width: 200px; /* Ширина текстового поля */
-  height: 300px; /* Высота текстового поля */
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  resize: none; /* Запрещаем изменение размера */
-}
-
 /* Контейнер для переключателя */
 .toggle-switch-customer-depot {
   position: relative;
   display: inline-block;
-  width: 200px;
+  /* width: 200px; */
   height: 34px;
   border-radius: 34px;
   overflow: hidden;
@@ -168,4 +158,51 @@ input:checked + .slider .text.off {
   margin-left: 10px;
   cursor: pointer;
   float: right;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px;
+  width: 200px;
+}
+
+label {
+  margin-right: 10px;
+  font-weight: bold;
+  color: #333;
+}
+
+input[type="text"] {
+  flex: 1;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100px;
+}
+
+input[type="text"]:focus {
+  border-color: #66afe9;
+  outline: none;
+  box-shadow: 0 0 5px rgba(102, 175, 233, 0.6);
+}
+
+
+.popup {
+  position: fixed; /* Фиксированное позиционирование */
+  left: 20px; /* Отступ слева */
+  bottom: 20px; /* Отступ снизу */
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.8); /* Полупрозрачный черный фон */
+  color: white; /* Белый текст */
+  border-radius: 5px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  z-index: 1000; /* Убедитесь, что окно поверх других элементов */
+  display: none; /* Скрываем по умолчанию */
+}
+
+.popup.show {
+  display: block; /* Показываем окно */
 }

@@ -139,12 +139,12 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
   console.log(featuresDepot);
 
   if (featuresCustomers.length === 0) {
-    showError('Не выбраны точки клиентов');
+    showError('No customer points selected');
     return;
   }
 
   if (featuresDepot.length === 0 || featuresDepot.length > 1) {
-    showError('Не выбрана точка склада или более одной точки склада');
+    showError('No depot point selected or more than one point selected');
     return;
   }
 
@@ -166,24 +166,33 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
   });
   console.log("markersDataDepot:", markersDataDepot); // Логируем данные маркеров
 
+  const vehicleCapacity = parseInt(document.getElementById('input-vehicle-capacity').value);
+  const customersDemand = parseInt(document.getElementById('input-customers-demand').value);
 
+  console.log("vehicleCapacity:", vehicleCapacity);
+  console.log("customersDemand:", customersDemand);
+
+  if (customersDemand > vehicleCapacity) {
+    showError('Customers demand is greater than vehicle capacity');
+    return;
+  }
   // Создаём запрос на сервер
   const request = Request_pb.create({
     depot: Customer_pb.create({
       coordinate: Coordinate_pb.create(markersDataDepot[0]),
-      demand: 100
+      demand: vehicleCapacity,
     }),
     customers: markersDataCustomers.map((marker) => Customer_pb.create({
       coordinate: Coordinate_pb.create(marker),
-      demand: 50,
+      demand: customersDemand,
     })),
-    timestamp: Date.now()
+    timestamp: Date.now(),
   });
 
   const requestBody = Request_pb.encode(request).finish();
 
   try {
-    console.log(JSON.stringify(request.toJSON(), null, 2));
+    console.log(request);
     console.log(requestBody);
     // Отправляем GET-запрос на сервер
     const url = SERVER_URL + "?timestamp=" + Date.now();
@@ -213,11 +222,6 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
       const decodedCoordinates = polyline.decode(route.polyline);
       const routePoints = decodedCoordinates.map(coord => ol.proj.fromLonLat([coord[1], coord[0]]));
 
-      // Создаем линию (маршрут)
-      const routeFeature = new ol.Feature({
-        geometry: new ol.geom.LineString(routePoints),
-      });
-
       // Выбираем цвет из массива
       const color = routesColors[i % routesColors.length]; // Используем остаток от деления для циклического выбора цвета
       // Создаем стиль для маршрута
@@ -228,6 +232,14 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
           // opacity: 80,
         }),
       });
+
+      // Создаем линию (маршрут)
+      const routeFeature = new ol.Feature({
+        geometry: new ol.geom.LineString(routePoints),
+        type: 'route',
+        layer: routeLayer,
+        style: routeStyle,
+      });
       // Применяем стиль к маршруту
       routeFeature.setStyle(routeStyle);
 
@@ -237,6 +249,12 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
       // addDirectionArrows(routeFeature.getGeometry(), routeSource, color);
     }
 
+    const popup = document.getElementById('popup');
+    const popupValue = document.getElementById('popup-total-distance');
+    const totalDistance = parseInt(response_pb.totalDistance);
+    popupValue.textContent = "Total distance: " + totalDistance / 1000 + " km"; // Обновляем текст
+    popup.classList.add('show'); // Показываем окно
+
     // Опционально: Увеличиваем масштаб карты, чтобы маршрут был виден целиком
     // const extent = routeFeature.getGeometry().getExtent();
     // map.getView().fit(extent, { padding: [50, 50, 50, 50] });
@@ -244,6 +262,11 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
     // Обрабатываем ошибку
     console.log(`Ошибка: ${error.message}`);
   }
+});
+
+document.getElementById('clearRoutesBtn').addEventListener('click', async () => {
+  routeSource.clear();
+  popup.classList.remove('show'); // Показываем окно
 });
 
 // Обработчик клика на карте
@@ -258,6 +281,22 @@ map.on('click', (event) => {
     const toggleButton = document.getElementById('toggle-button-customer-depot');
 
     if (clickedFeature) {
+      if (clickedFeature.get('type') === 'route') {
+        const layer = clickedFeature.get('layer');
+        layer.getSource().getFeatures().forEach((feature) => {
+          const style = feature.get('style'); // Получаем стиль
+          style.setZIndex(998); // Устанавливаем высокий z-index
+          style.getStroke().setWidth(4); // Устанавливаем ширину линии
+          feature.setStyle(style);
+        });
+
+        const style = clickedFeature.get('style'); // Получаем стиль
+        style.setZIndex(999); // Устанавливаем высокий z-index
+        style.getStroke().setWidth(7); // Устанавливаем ширину линии
+        clickedFeature.setStyle(style);
+
+        return;
+      }
       markersCustomersSource.removeFeature(clickedFeature);
       markersDepotSource.removeFeature(clickedFeature);
       return;

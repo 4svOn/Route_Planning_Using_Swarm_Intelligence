@@ -62,20 +62,16 @@ namespace {
 
                 SI::CVRP::TNodesWithCoordinates nodes = {requestBodyPb};
 
-                DEBUG_INFO("NO SEG FAULT AFTER MAKING NODES");
                 osrm::ResponseTable tableResponse = SendTableRequest(nodes);
-                DEBUG_INFO("NO SEG FAULT AFTER TABLE RESPONSE");
                 SI::CVRP::TProblem problem{nodes, tableResponse.GetDurationTable(), tableResponse.GetDistanceTable()};
-                DEBUG_INFO("NO SEG FAULT AFTER PROBLEM CONSTRUCTIOn");
                 try {
                     SI::CVRP::TSolution solution = SolveByACO(problem);
-                    DEBUG_INFO("NO SEG FAULT AFTER SOLVE");
                     pb::Response response_pb = PrepareResponse(solution);
+                    // LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
                     std::string res;
                     response_pb.SerializeToString(&res);
                     return res;
                 } catch (const std::exception& e) {
-                    DEBUG_INFO(e.what());
                     throw;
                 }
 
