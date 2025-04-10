@@ -83,6 +83,10 @@ namespace SI::CVRP {
     TIteratorRange<TRouteIterator> TSolution::RouteWithCoordinates(const TRoute& route) const {
         return MakeIteratorRange<TRouteIterator>(TRouteIterator(this, &route), TRouteIterator());
     }
+
+    bool TSolution::operator<(const TSolution& other) const {
+        return TotalDistance_ < other.TotalDistance_;
+    }
     // --------------------------------------------------------------------------------
 
     // TRouteIterator------------------------------------------------------------------

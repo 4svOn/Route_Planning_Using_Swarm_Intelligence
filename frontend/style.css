@@ -201,7 +201,13 @@ input[type="text"]:focus {
   font-size: 14px;
   z-index: 1000; /* Убедитесь, что окно поверх других элементов */
   display: none; /* Скрываем по умолчанию */
+  white-space: pre-line;
+
 }
+
+/* .popup-total-distance {
+  white-space: pre-line;
+} */
 
 .popup.show {
   display: block; /* Показываем окно */

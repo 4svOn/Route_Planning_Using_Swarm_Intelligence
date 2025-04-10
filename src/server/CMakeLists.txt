@@ -16,6 +16,7 @@ target_include_directories(${LIB_NAME}
 target_link_libraries(${LIB_NAME} PUBLIC userver::core)
 
 target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_SI_ACO)
+target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_SI_PSO)
 target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_SI_common)
 target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_proto)
 target_link_libraries(${LIB_NAME} PRIVATE ${PROJECT_NAME}_OSRM)

@@ -28,7 +28,7 @@ add_subdirectory(proto)
 add_executable(${PROJECT_NAME} src/main.cpp)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_server)
 target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_SI_ACO)
-target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_PSO)
+target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_SI_PSO)
 # target_link_libraries(${PROJECT_NAME} PRIVATE ${PROJECT_NAME}_SI_util)
 
 

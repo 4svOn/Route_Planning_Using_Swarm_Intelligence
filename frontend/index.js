@@ -39,6 +39,7 @@ const response_root = await protobuf.load('./proto/response.proto');
 
 // Получите типы сообщений
 const Coordinate_pb = common_root.lookupType('pb.Coordinate');
+const Algorithm_pb = common_root.lookupEnum('pb.Algorithm');
 const Customer_pb = request_root.lookupType('pb.Customer');
 const Request_pb = request_root.lookupType('pb.Request');
 const Route_pb = response_root.lookupType('pb.Route');
@@ -187,6 +188,7 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
       demand: customersDemand,
     })),
     timestamp: Date.now(),
+    algorithm: Algorithm_pb.values.BOTH,
   });
 
   const requestBody = Request_pb.encode(request).finish();
@@ -252,7 +254,14 @@ document.getElementById('sendRequestBtn').addEventListener('click', async () => 
     const popup = document.getElementById('popup');
     const popupValue = document.getElementById('popup-total-distance');
     const totalDistance = parseInt(response_pb.totalDistance);
-    popupValue.textContent = "Total distance: " + totalDistance / 1000 + " km"; // Обновляем текст
+
+    let algoText = "";
+    if (response_pb.algorithm === Algorithm_pb.values.ACO) {
+      algoText = "ACO";
+    } else if (response_pb.algorithm === Algorithm_pb.values.PSO) {
+      algoText = "PSO";
+    }
+    popupValue.textContent = "Total distance: " + totalDistance / 1000 + " km\n" + "Solved by " + algoText; // Обновляем текст
     popup.classList.add('show'); // Показываем окно
 
     // Опционально: Увеличиваем масштаб карты, чтобы маршрут был виден целиком

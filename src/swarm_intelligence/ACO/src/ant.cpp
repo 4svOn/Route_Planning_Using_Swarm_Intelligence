@@ -17,15 +17,13 @@ namespace SI::ACO {
         Routes_.back().emplace_back(Problem_.Depot());
     }
 
-    void TAnt::Reset()
-    {
+    void TAnt::Reset() {
         VisitedCustomers_.clear();
         UnvisitedCustomers_.insert(Problem_.Customers().begin(), Problem_.Customers().end());
         RemainingCapacity_ = Problem_.Capacity();
     }
 
-    TDistance TAnt::TotalDistance() const
-    {
+    TDistance TAnt::TotalDistance() const {
         TDistance totalDistance = 0;
         for (const auto& route : Routes_) {
             for (size_t i = 0; i < route.size() - 1; ++i) {
@@ -35,7 +33,7 @@ namespace SI::ACO {
         return totalDistance;
     }
 
-    CVRP::TRoutes TAnt::GetRoutes() const {
+    const CVRP::TRoutes& TAnt::GetRoutes() const {
         return Routes_;
     }
 

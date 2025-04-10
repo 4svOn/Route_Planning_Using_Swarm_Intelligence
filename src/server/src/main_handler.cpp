@@ -15,9 +15,14 @@
 
 #include <swarm_intelligence/ACO/solver.hpp>
 #include <swarm_intelligence/ACO/util.hpp>
+
+#include <swarm_intelligence/PSO/solver.hpp>
+#include <swarm_intelligence/PSO/util.hpp>
+
 #include <swarm_intelligence/common/CVRP_problem.hpp>
 #include <swarm_intelligence/common/node.hpp>
 
+#include "proto/cpp/common.pb.h"
 #include "proto/cpp/request.pb.h"
 #include "proto/cpp/response.pb.h"
 
@@ -60,13 +65,14 @@ namespace {
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
                 pb::Request requestBodyPb = ParseRequestBody(request.RequestBody());
 
-                SI::CVRP::TNodesWithCoordinates nodes = {requestBodyPb};
+                SI::CVRP::TNodesWithCoordinates nodes{requestBodyPb};
 
                 osrm::ResponseTable tableResponse = SendTableRequest(nodes);
                 SI::CVRP::TProblem problem{nodes, tableResponse.GetDurationTable(), tableResponse.GetDistanceTable()};
+
+
                 try {
-                    SI::CVRP::TSolution solution = SolveByACO(problem);
-                    pb::Response response_pb = PrepareResponse(solution);
+                    pb::Response response_pb = PrepareResponse(SolveCVRP(problem, requestBodyPb.algorithm()));
                     // LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
                     std::string res;
                     response_pb.SerializeToString(&res);
@@ -74,8 +80,6 @@ namespace {
                 } catch (const std::exception& e) {
                     throw;
                 }
-
-
             }
             return "";
         }
@@ -97,8 +101,10 @@ namespace {
             return requestBodyPb;
         }
 
-        pb::Response PrepareResponse(const SI::CVRP::TSolution& solution) const {
+        pb::Response PrepareResponse(const std::pair<pb::Algorithm, SI::CVRP::TSolution>& algo_solution) const {
+            const auto& solution = algo_solution.second;
             pb::Response response_pb;
+            response_pb.set_algorithm(algo_solution.first);
             response_pb.set_total_distance(solution.TotalDistance());
             for (const auto& route : solution.Routes()) {
                 base::Coordinates routeCoordinates;
@@ -122,8 +128,34 @@ namespace {
             return *osrmResponse;
         }
 
+        std::pair<pb::Algorithm, SI::CVRP::TSolution> SolveCVRP(const SI::CVRP::TProblem& problem, pb::Algorithm algo) const {
+            if (algo == pb::Algorithm::ACO) {
+                auto acoSolution = SolveByACO(problem);
+                LOG_INFO() << "ACO solution: " << acoSolution.TotalDistance();
+                return {pb::Algorithm::ACO, SolveByACO(problem)};
+            } else if (algo == pb::Algorithm::PSO) {
+                auto psoSolution = SolveByPSO(problem);
+                LOG_INFO() << " PSO solution: " << psoSolution.TotalDistance();
+                return {pb::Algorithm::PSO, SolveByPSO(problem)};
+            } else if (algo == pb::Algorithm::BOTH) {
+                auto acoSolution = SolveByACO(problem);
+                auto psoSolution = SolveByPSO(problem);
+                LOG_INFO() << "ACO solution: " << acoSolution.TotalDistance();
+                LOG_INFO() << " PSO solution: " << psoSolution.TotalDistance();
+                if (acoSolution < psoSolution) {
+                    return {pb::Algorithm::ACO, acoSolution};
+                }
+                return {pb::Algorithm::PSO, psoSolution};
+            }
+                throw userver::server::handlers::InternalServerError();
+        }
+
         SI::CVRP::TSolution SolveByACO(const SI::CVRP::TProblem& problem) const {
             return SI::ACO::TSolver{problem, SI::ACO::TParameters{}}.Solve();
+        }
+
+        SI::CVRP::TSolution SolveByPSO(const SI::CVRP::TProblem& problem) const {
+            return SI::PSO::TSolver{problem, SI::PSO::TParameters{}}.Solve();
         }
 
 

@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.14)
 
-set(LIB_NAME ${PROJECT_NAME}_PSO)
+set(LIB_NAME ${PROJECT_NAME}_SI_PSO)
 
-add_library(${LIB_NAME} OBJECT
-    src/test.cpp
+add_library(${LIB_NAME} STATIC
+    src/particle.cpp
+    src/solver.cpp
+    src/util.cpp
 )
 
 target_include_directories(${LIB_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -12,4 +14,9 @@ target_include_directories(${LIB_NAME}
     PUBLIC $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>
 )
 
+# target_link_libraries(${LIB_NAME} PUBLIC userver::core)
+
+
+target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_base)
+target_link_libraries(${LIB_NAME} PUBLIC ${PROJECT_NAME}_SI_common)
 

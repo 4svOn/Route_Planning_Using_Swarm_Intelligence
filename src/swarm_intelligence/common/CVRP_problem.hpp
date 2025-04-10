@@ -62,6 +62,8 @@ namespace SI::CVRP {
     public:
         TSolution(const TProblem& problem, const TRoutes& routes, int64_t totalDistance);
 
+        TSolution& operator=(const TSolution& other) = default;
+
         const TProblem& Problem() const;
         const TRoutes& Routes() const;
         int64_t TotalDistance() const;
@@ -69,10 +71,12 @@ namespace SI::CVRP {
         TIteratorRange<TRouteIterator> RouteWithCoordinates(const TRoute& route) const;
         TIteratorRange<TRouteIterator> RouteWithCoordinates(const int64_t index) const;
 
-        private:
-            const TProblem& Problem_;
-            TRoutes Routes_;
-            int64_t TotalDistance_;
+        bool operator<(const TSolution& other) const;
+
+    private:
+        const TProblem& Problem_;
+        TRoutes Routes_;
+        int64_t TotalDistance_;
     };
 
     class TRouteIterator {

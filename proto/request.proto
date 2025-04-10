@@ -12,5 +12,6 @@ message Customer {
 message Request {
   Customer depot = 1;
   repeated Customer customers = 2;
+  pb.Algorithm algorithm = 3;
   int64 timestamp = 777;
 }
