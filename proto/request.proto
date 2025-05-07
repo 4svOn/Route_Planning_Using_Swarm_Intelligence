@@ -7,6 +7,7 @@ import "common.proto";
 message Customer {
   pb.Coordinate coordinate = 1;
   int64 demand = 2;
+  int64 uid = 3;
 }
 
 message Request {

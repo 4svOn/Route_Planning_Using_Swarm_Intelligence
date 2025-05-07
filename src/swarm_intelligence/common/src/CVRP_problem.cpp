@@ -29,7 +29,7 @@ namespace SI::CVRP {
     }
 
     uint64_t TProblem::NodesCount() const {
-        return Customers_.size() + 1;
+        return Nodes_.Nodes().size();
     }
 
     uint64_t TProblem::CustomersCount() const {
@@ -59,6 +59,17 @@ namespace SI::CVRP {
     TDistance TProblem::Distance(const TNode& from, const TNode& to) const {
         return DistanceMatrix[from.ID][to.ID];
     }
+
+    TDistance TProblem::RoutesTotalDistance(const TRoutes& routes) const {
+        TDistance totalDistance = 0;
+        for (const auto& route : routes) {
+            for (size_t i = 0; i < route.size() - 1; ++i) {
+                totalDistance += this->Distance(route[i], route[i + 1]);
+            }
+        }
+        return totalDistance;
+    }
+
     // ---------------------------------------------------------------------------------
 
     // TSolution-------------------------------------------------------------------------
@@ -110,7 +121,7 @@ namespace SI::CVRP {
 
     TNodeWithCoordinate TRouteIterator::operator*() {
         const TNode& node = Route_->at(Index_);
-        return {node, Solution_->Problem().Nodes().Coordinates()[node.ID]};
+        return {node, Solution_->Problem().Nodes().Coordinates()[node.ID], Solution_->Problem().Nodes().UIDsFromFrontend()[node.ID]};
     }
 
     bool TRouteIterator::operator==(const TRouteIterator& other) {

@@ -34,23 +34,29 @@ namespace SI::CVRP {
 
     struct TNodeWithCoordinate : TNode {
         base::Coordinate Coordinate;
+        int64_t UIDFromFrontend;
 
-        TNodeWithCoordinate(const TNode& node, const base::Coordinate& coordinate);
+        TNodeWithCoordinate(const TNode& node, const base::Coordinate& coordinate, const int64_t uid);
     };
 
     class TNodesWithCoordinates {
     public:
+        TNodesWithCoordinates(const std::vector<TNode>& nodes);
         TNodesWithCoordinates(const pb::Request& request_pb);
 
         const std::vector<TNode>& Nodes() const;
         const base::Coordinates& Coordinates() const;
+        const std::vector<int64_t>& UIDsFromFrontend() const;
 
         const TNode& Node(int64_t index) const;
-        const base::Coordinate& Coordinate(int64_t index) const;
+        const base::Coordinate& Coordinate(int64_t index) const; // TODO сделать так, чтобы возвращало TNodeWithCoordinate
+        int64_t UIDFromFrontend(int64_t index) const;
 
     private:
         std::vector<TNode> Nodes_;
         base::Coordinates Coordinates_;
+        std::vector<int64_t> UIDFromFrontend_;
+
     };
 
 } // namespace SI::CVRP

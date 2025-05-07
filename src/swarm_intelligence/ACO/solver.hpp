@@ -20,11 +20,12 @@ namespace SI::ACO {
         void DepositPheromones(const TAnt& ant); // global update
 
     private:
-        CVRP::TProblem Problem_;
+        const CVRP::TProblem& Problem_;
         TParameters Parameters_;
         std::vector<TAnt> Ants_;
         TPheromoneMatrix Pheromones_; // Pheromone matrix
         double BasePheromone_{1.0};
+        TDistance BaseDistance_{-1};
         TDistance BestDistance_{-1};
         int64_t BestAntIndex_{-1};
     };

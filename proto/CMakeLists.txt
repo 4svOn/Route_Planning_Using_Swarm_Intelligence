@@ -23,8 +23,14 @@ message ("PROTO_HDRS = ${PROTO_HDRS}")
 
 add_library(${LIB_NAME} STATIC ${PROTO_SRCS} ${PROTO_HDRS})
 
-target_include_directories(${LIB_NAME} PRIVATE ${PROTO_GEN_DIR})
-
-target_include_directories(${LIB_NAME} PUBLIC $<BUILD_INTERFACE:${PROTO_GEN_DIR}/../..>)
+target_include_directories(${LIB_NAME}
+    PUBLIC
+    $<BUILD_INTERFACE:${PROTO_GEN_DIR}>  # Для generated headers
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/../..>    # Чтобы сохранить структуру proto/cpp/
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/..>    # Чтобы сохранить структуру proto/cpp/
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>    # Чтобы сохранить структуру proto/cpp/
+    ${Protobuf_INCLUDE_DIRS}
+)
 
 target_link_libraries(${LIB_NAME} PUBLIC ${Protobuf_LIBRARIES})
+

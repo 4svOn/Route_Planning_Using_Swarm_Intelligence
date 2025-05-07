@@ -1,0 +1,51 @@
+@startuml PSO_Component_Class_Diagram
+
+title PSO Component Class Diagram
+
+skinparam nodesep 50
+skinparam ranksep 80
+set separator none
+
+
+namespace SI::PSO {
+
+class TParticle {
+  + TParticle(CVRP::TProblem)
+  + TParticle(CVRP::TProblem, vector<TCoordinate>)
+  + TotalDistance() : TDistance
+  + GetRoutes() : CVRP::TRoutes
+  + Evaluate() : TDistance
+  + BestDistance() : TDistance
+  + BestPosition() : vector<TCoordinate>
+  + Update(TParameters, TDistance)
+  - Problem_ : CVRP::TProblem
+  - Routes_ : CVRP::TRoutes
+  - Position_ : vector<TCoordinate>
+  - Velocity_ : vector<TCoordinate>
+  - BestPosition_ : vector<TCoordinate>
+  - BestDistance_ : TDistance
+}
+
+class TSolver {
+  + TSolver(CVRP::TProblem, TParameters)
+  + Solve() : CVRP::TSolution
+  + GetBestDistance() : TDistance
+  - ConstructBestRoutes() : CVRP::TRoutes
+  - Problem_ : CVRP::TProblem
+  - Parameters_ : TParameters
+  - Particles_ : vector<TParticle>
+  - BestPosition_ : vector<TCoordinate>
+  - BestDistance_ : TDistance
+}
+
+class TParameters {
+  + SwarmSize : int64_t = 25
+  + MaxIterations : int64_t = 10000
+  + W : TCoordinate = 0.6
+  + C1 : TCoordinate = 1.5
+  + C2 : TCoordinate = 1.5
+}
+
+TSolver "1" *-- "1" TParameters : uses >
+TSolver "1" *-- "1..*" TParticle : manages >
+}

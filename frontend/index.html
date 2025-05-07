@@ -23,18 +23,28 @@
           <span class="text off">Depot</span>
         </span>
       </label>
-      <button id="sendRequestBtn" class="controls-button">Process calculations</button>
-      <!-- <p id="responseText"></p> -->
-      <div class="input-group">
-        <label for="input1">Vehicle capacity:</label>
-        <input type="text" id="input-vehicle-capacity" inputmode="numeric" pattern="\d*" placeholder="Input a number" value="100">
+      <label id="toggle-switch-aco-pso" class="toggle-switch-aco-pso hidden-element">
+        <input type="checkbox" id="toggle-button-aco-pso">
+        <span class="slider">
+          <span class="text on">ACO</span>
+          <span class="text off">PSO</span>
+        </span>
+      </label>
+      <div class="controls-button-container">
+        <button id="sendRequestBtn" class="controls-button">Process calculations</button>
+        <!-- <p id="responseText"></p> -->
+        <button id="clearRoutesBtn" class="controls-button">Clear routes</button>
       </div>
-      <div class="input-group">
-        <label for="input2">Customers demand:</label>
-        <input type="text" id="input-customers-demand" inputmode="numeric" pattern="\d*" placeholder="Input a number" value="50">
+
+      <h4 id="route-markers-list-title" class="route-markers-list-title hidden-element list-title">Points on the route:</h4>
+      <div id="route-markers-list-container" class="route-markers-list-container hidden-element list-container">
+        <ul id="route-markers-list"></ul>
       </div>
-      <button id="clearRoutesBtn" class="controls-button">Clear routes</button>
-    </div>
+
+      <h4 class="markers-list-title list-title">Added points:</h4>
+      <div class="markers-list-container list-container">
+        <ul id="markers-list"></ul>
+      </div>
   </div>
 
   <div id="error-message" class="error-message">
@@ -47,7 +57,7 @@
   </div>
 
   <!-- JavaScript код для инициализации карты -->
-  <script type="module" src="./index.js"></script>
+  <script type="module" src="./js/main.js"></script>
   <script src="https://unpkg.com/@mapbox/polyline@1.1.1/lib/polyline.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/ol@v7.3.0/dist/ol.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>

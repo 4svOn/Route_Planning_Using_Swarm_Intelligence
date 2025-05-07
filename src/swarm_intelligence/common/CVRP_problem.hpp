@@ -45,6 +45,8 @@ namespace SI::CVRP {
         TDuration Duration(const TNode& from, const TNode& to) const;
         TDistance Distance(const TNode& from, const TNode& to) const;
 
+        TDistance RoutesTotalDistance(const TRoutes& routes) const;
+
     private:
         TNode Depot_;
         std::vector<TNode> Customers_;
@@ -53,7 +55,7 @@ namespace SI::CVRP {
         TDurationTable DurationMatrix;
         TDistanceTable DistanceMatrix;
 
-        const TNodesWithCoordinates& Nodes_;
+        const TNodesWithCoordinates Nodes_;
     };
 
     class TRouteIterator;

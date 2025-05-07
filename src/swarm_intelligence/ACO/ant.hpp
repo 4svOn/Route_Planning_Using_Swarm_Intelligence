@@ -18,6 +18,7 @@ namespace SI::ACO {
         void Reset();  // Reset for next iteration
 
         TDistance TotalDistance() const;
+        CVRP::TRoutes& GetRoutes();
         const CVRP::TRoutes& GetRoutes() const;
 
         void ConstructSolution(const TParameters& parameters, const TPheromoneMatrix& pheromones); // Build routes probabilistically

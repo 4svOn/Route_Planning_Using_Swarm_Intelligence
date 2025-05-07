@@ -1,0 +1,96 @@
+@startuml ACO_Component_Class_Diagram
+
+title ACO Component Class Diagram
+
+skinparam nodesep 90
+skinparam ranksep 100
+skinparam linetype ortho
+' top to bottom direction
+set separator none
+
+namespace SI::ACO {
+
+    class TParameters {
+        +PheromonceImportance: double = 1.0
+        +DistanceImportance: double = 5.0
+        +EvaporateRate: double = 0.01
+        +ProbabalisticBorder: double = 0.7
+        +AntsPerIteration: int64_t = 50
+        +MaxIterations: int64_t = 5000
+    }
+
+    class TSolver {
+        +TSolver(CVRP::TProblem, TParameters)
+        +Solve(): CVRP::TSolution
+        +GetBestDistance(): TDistance
+        -InitializePheromones(): void
+        -EvaporatePheromones(ant: TAnt): void
+        -DepositPheromones(ant: TAnt): void
+        -Problem_: CVRP::TProblem
+        -Parameters_: TParameters
+        -Ants_: std::vector<TAnt>
+        -Pheromones_: TPheromoneMatrix
+        -BasePheromone_: double = 1.0
+        -BestDistance_: TDistance = -1
+        -BestAntIndex_: int64_t = -1
+    }
+
+    class TAnt {
+        +TAnt(problem: CVRP::TProblem&)
+        +Reset(): void
+        +TotalDistance(): TDistance
+        +GetRoutes(): CVRP::TRoutes
+        +ructSolution(TParameters, TPheromoneMatrix): void
+        -VisitCustomer(CVRP::TNode): void
+        -ReturnToDepot(): void
+        -SelectNextCustomer(..): CVRP::TNode
+        -Problem_:  CVRP::TProblem
+        -Routes_: CVRP::TRoutes
+        -VisitedCustomers_: CVRP::TNodesSet
+        -UnvisitedCustomers_: CVRP::TNodesSet
+        -RemainingCapacity_: int64_t
+    }
+
+    class TPheromoneMatrix << (T,#FF7700) >> {
+        ..std::vector<std::vector<double>>..
+    }
+}
+
+' namespace SI.CVRP {
+'     class TProblem {
+'     }
+
+'     class TSolution {
+'     }
+
+'     class TNode {
+'     }
+
+'     class TRoutes << (T,#FF7700) >> {
+'         ..std::vector<std::vector<TNode>>..
+'     }
+
+'     class TNodesSet << (T,#FF7700) >> {
+'         ..std::set<TNode>..
+'     }
+' }
+
+' Explicit class-to-class relationships
+TSolver "1" *-right- "1" TParameters : uses >
+TSolver "1" *-- "1..*" TAnt : manages >
+' TSolver *-[hidden]-  TPheromoneMatrix
+' TSolver *-[hidden]-  TPheromoneMatrix
+TSolver "1" *-- "1" TPheromoneMatrix : maintains >
+
+' SI.ACO.TSolver --> SI.CVRP.TProblem : contains >
+' SI.ACO.TAnt --> SI.CVRP.TProblem : references >
+
+' SI.ACO.TSolver --> SI.CVRP.TSolution : produces >
+' SI.ACO.TAnt --> SI.CVRP.TNode : visits >
+' SI.ACO.TAnt --> SI.CVRP.TRoutes : builds >
+
+' TSolver -[hidden]-> TAnt
+' TSolver -[hidden]-> TAnt
+' TSolver --> TAnt : calls ConstructSolution()
+
+@enduml

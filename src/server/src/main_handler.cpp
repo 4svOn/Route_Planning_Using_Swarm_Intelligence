@@ -4,11 +4,13 @@
 
 #include <userver/components/component_context.hpp>
 #include <userver/clients/http/component.hpp>
+#include <userver/engine/task/task_with_result.hpp>
 #include <userver/server/handlers/http_handler_base.hpp>
 #include <userver/server/handlers/exceptions.hpp>
 #include <userver/server/http/http_method.hpp>
 #include <userver/http/common_headers.hpp>
 #include <userver/http/predefined_header.hpp>
+#include <userver/utils/async.hpp>
 
 #include <osrm_client/client.hpp>
 #include <osrm_client/request.hpp>
@@ -65,6 +67,8 @@ namespace {
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
                 pb::Request requestBodyPb = ParseRequestBody(request.RequestBody());
 
+                LOG_INFO() << "REQUEST: " << request.RequestBody();
+
                 SI::CVRP::TNodesWithCoordinates nodes{requestBodyPb};
 
                 osrm::ResponseTable tableResponse = SendTableRequest(nodes);
@@ -101,19 +105,64 @@ namespace {
             return requestBodyPb;
         }
 
-        pb::Response PrepareResponse(const std::pair<pb::Algorithm, SI::CVRP::TSolution>& algo_solution) const {
-            const auto& solution = algo_solution.second;
+        pb::Response PrepareResponse(const std::vector<std::pair<pb::Algorithm, SI::CVRP::TSolution>>& algoSolutions) const {
             pb::Response response_pb;
-            response_pb.set_algorithm(algo_solution.first);
-            response_pb.set_total_distance(solution.TotalDistance());
-            for (const auto& route : solution.Routes()) {
-                base::Coordinates routeCoordinates;
-                for (const auto& node : solution.RouteWithCoordinates(route)) {
-                    routeCoordinates.emplace_back(node.Coordinate);
+            SI::TDistance bestTotalDistance = -1;
+            for (const auto& algoSolution : algoSolutions) {
+                pb::CVRP_Solution* solution_pb = nullptr;
+
+                if (algoSolution.first == pb::Algorithm::ACO) {
+                    solution_pb = response_pb.mutable_aco_solution();
+                } else if (algoSolution.first == pb::Algorithm::PSO) {
+                    solution_pb = response_pb.mutable_pso_solution();
+
                 }
-                osrm::ResponseRoute osrmResponseRoute = SendRouteRequest(routeCoordinates);
-                response_pb.add_routes()->set_polyline(osrmResponseRoute.GetPolyline());
+                assert(solution_pb != nullptr);
+
+                const auto& solution = algoSolution.second;
+
+                if (solution.TotalDistance() < bestTotalDistance || bestTotalDistance == -1) {
+                    bestTotalDistance = solution.TotalDistance();
+                    response_pb.set_better_algorithm(algoSolution.first);
+                }
+                solution_pb->set_algorithm(algoSolution.first);
+
+                solution_pb->set_total_distance(solution.TotalDistance());
+
+                std::vector<userver::engine::TaskWithResult<std::pair<std::vector<int64_t>, osrm::ResponseRoute>>> tasks;
+                tasks.reserve(solution.Routes().size());
+                LOG_INFO() << "Algorithm: " << algoSolution.first;
+                LOG_INFO() << "Nodes count: " << algoSolution.second.Problem().Nodes().Nodes().size();
+                LOG_INFO() << "Coordinates count: " << algoSolution.second.Problem().Nodes().Coordinates().size();
+
+                for (const auto& route : solution.Routes()) {
+                    tasks.push_back(userver::utils::Async("OSRM_route_request", [route = std::move(route), &solution, this] {
+                        base::Coordinates routeCoordinates;
+                        std::vector<int64_t> routeUIDs;
+                        for (const auto& node : solution.RouteWithCoordinates(route)) {
+                            routeCoordinates.emplace_back(node.Coordinate);
+                            routeUIDs.push_back(node.UIDFromFrontend);
+                        }
+                        return std::make_pair(routeUIDs, SendRouteRequest(routeCoordinates));
+                    }));
+                }
+
+
+                for (auto& task : tasks) {
+                    auto [routeUIDs, routeResponse] = task.Get();
+                    auto* route_pb = solution_pb->add_routes();
+                    route_pb->set_polyline(routeResponse.GetPolyline());
+                    for (const auto& uid : routeUIDs) {
+                        route_pb->add_uids(uid);
+                    }
+                }
+                LOG_INFO() << "ACO algo: " << response_pb.aco_solution().algorithm();
+                LOG_INFO() << "PSO algo: " << response_pb.pso_solution().algorithm();
             }
+
+            LOG_INFO() << "Response: " << response_pb.DebugString();
+            LOG_INFO() << "Better solution: " << response_pb.better_algorithm();
+
             return response_pb;
         }
 
@@ -128,37 +177,26 @@ namespace {
             return *osrmResponse;
         }
 
-        std::pair<pb::Algorithm, SI::CVRP::TSolution> SolveCVRP(const SI::CVRP::TProblem& problem, pb::Algorithm algo) const {
-            if (algo == pb::Algorithm::ACO) {
-                auto acoSolution = SolveByACO(problem);
-                LOG_INFO() << "ACO solution: " << acoSolution.TotalDistance();
-                return {pb::Algorithm::ACO, SolveByACO(problem)};
-            } else if (algo == pb::Algorithm::PSO) {
-                auto psoSolution = SolveByPSO(problem);
-                LOG_INFO() << " PSO solution: " << psoSolution.TotalDistance();
-                return {pb::Algorithm::PSO, SolveByPSO(problem)};
-            } else if (algo == pb::Algorithm::BOTH) {
-                auto acoSolution = SolveByACO(problem);
-                auto psoSolution = SolveByPSO(problem);
-                LOG_INFO() << "ACO solution: " << acoSolution.TotalDistance();
-                LOG_INFO() << " PSO solution: " << psoSolution.TotalDistance();
-                if (acoSolution < psoSolution) {
-                    return {pb::Algorithm::ACO, acoSolution};
-                }
-                return {pb::Algorithm::PSO, psoSolution};
+        std::vector<std::pair<pb::Algorithm, SI::CVRP::TSolution>> SolveCVRP(const SI::CVRP::TProblem& problem, pb::Algorithm algo) const {
+            std::vector<userver::engine::TaskWithResult<std::pair<pb::Algorithm, SI::CVRP::TSolution>>> tasks;
+
+            if (algo == pb::Algorithm::ACO || algo == pb::Algorithm::BOTH) {
+                tasks.push_back(userver::utils::Async("CVRP_SOLVING", [&problem, this] {
+                    return std::make_pair(pb::Algorithm::ACO, SI::ACO::TSolver{problem, SI::ACO::TParameters{}}.Solve());
+                }));
             }
-                throw userver::server::handlers::InternalServerError();
+            if (algo == pb::Algorithm::PSO || algo == pb::Algorithm::BOTH) {
+                tasks.push_back(userver::utils::Async("CVRP_SOLVING", [&problem, this] {
+                    return std::make_pair(pb::Algorithm::PSO, SI::PSO::TSolver{problem, SI::PSO::TParameters{}}.Solve());
+                }));
+            }
+
+            std::vector<std::pair<pb::Algorithm, SI::CVRP::TSolution>> solutions;
+            for (auto& task : tasks) {
+                solutions.push_back(task.Get());
+            }
+            return solutions;
         }
-
-        SI::CVRP::TSolution SolveByACO(const SI::CVRP::TProblem& problem) const {
-            return SI::ACO::TSolver{problem, SI::ACO::TParameters{}}.Solve();
-        }
-
-        SI::CVRP::TSolution SolveByPSO(const SI::CVRP::TProblem& problem) const {
-            return SI::PSO::TSolver{problem, SI::PSO::TParameters{}}.Solve();
-        }
-
-
 
         // SI::CVRP::TProblem SolveByACO(const SI::CVRPLibrary::TProblem& problem)
 

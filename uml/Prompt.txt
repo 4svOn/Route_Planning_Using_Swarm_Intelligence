@@ -1,0 +1,4 @@
+Here is files of some component in my project. This component implements description of CVRP. Make a class diagram using PlantUML language.
+Do not transfer `const` and `&`. Do not transfer names of parameters in functions.
+Do not transfer classes except classes in SI::CVRP namespace.
+Try to make diagram more vertical.

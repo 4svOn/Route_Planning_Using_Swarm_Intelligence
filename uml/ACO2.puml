@@ -1,0 +1,52 @@
+@startuml
+skinparam defaultFontName Arial
+skinparam classFontSize 14
+skinparam nodesep 20
+skinparam ranksep 30
+
+class TAnt {
+  + TAnt(problem)
+  + Reset()
+  + TotalDistance(): TDistance
+  + GetRoutes(): const CVRP::TRoutes&
+  + ConstructSolution(parameters, pheromones)
+  - VisitCustomer(customer)
+  - ReturnToDepot()
+  - SelectNextCustomer(feasibleCustomers, parameters, pheromones): CVRP::TNode
+  - Problem_: const CVRP::TProblem&
+  - Routes_: CVRP::TRoutes
+  - VisitedCustomers_: CVRP::TNodesSet
+  - UnvisitedCustomers_: CVRP::TNodesSet
+  - RemainingCapacity_: int64_t
+}
+
+class TSolver {
+  + TSolver(problem, parameters)
+  + Solve(): CVRP::TSolution
+  + GetBestDistance(): TDistance
+  - InitializePheromones()
+  - EvaporatePheromones(ant)
+  - DepositPheromones(ant)
+  - Problem_: CVRP::TProblem
+  - Parameters_: TParameters
+  - Ants_: std::vector<TAnt>
+  - Pheromones_: TPheromoneMatrix
+  - BasePheromone_: double
+  - BestDistance_: TDistance
+  - BestAntIndex_: int64_t
+}
+
+class TParameters {
+  + PheromonceImportance: double
+  + DistanceImportance: double
+  + EvaporateRate: double
+  + ProbabalisticBorder: double
+  + AntsPerIteration: int64_t
+  + MaxIterations: int64_t
+}
+
+TSolver --> TAnt : uses
+TSolver --> TParameters : contains
+TSolver --> TPheromoneMatrix : uses
+
+@enduml

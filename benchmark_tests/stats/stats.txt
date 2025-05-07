@@ -1,0 +1,99 @@
+Set A
+
+Worst ACO: A-n37-k5
+(Augerat et al, No of trucks: 5, Optimal value: 669)
+Etalon: 669. Found: 789
+Percent: 17.9372
+
+Best ACO: A-n61-k9
+(Augerat et al, No of trucks: 9, Optimal value: 1034)
+Etalon: 1034. Found: 1104
+Percent: 6.76983
+
+
+
+Worst PSO: A-n69-k9
+(Augerat et al, No of trucks: 9, Optimal value: 1159)
+Best: 1159. Found: 1563
+Percent: 34.8576
+
+Best PSO: A-n37-k6
+(Augerat et al, No of trucks: 6, Optimal value: 949)
+Best: 949. Found: 1022
+Percent: 7.69231
+
+
+Average time ACO: 11714
+Average time PSO: 4956.19
+
+Percent ACO: 13.7727
+Percent PSO: 21.1899
+
+
+
+-----------------------------------------------
+Set B
+
+Worst ACO: B-n39-k5
+(Augerat et al, No of trucks: 5, Optimal value: 549)
+Etalon: 549. Found: 710
+Percent: 29.326
+
+Best ACO: B-n51-k7
+(Augerat et al, No of trucks: 7, Optimal value: 1032)
+Etalon: 1032. Found: 1053
+Percent: 2.03488
+
+
+
+Worst PSO: B-n64-k9
+(Augerat et al, No of trucks: 9, Optimal value: 861)
+Best: 861. Found: 1292
+Percent: 50.0581
+
+Best PSO: B-n34-k5
+(Augerat et al, No of trucks: 5, Optimal value: 788)
+Best: 788. Found: 801
+Percent: 1.64975
+
+
+Average time ACO: 13017
+Average time PSO: 6133.78
+
+Percent ACO: 13.1142
+Percent PSO: 15.381
+
+
+
+
+-----------------------------------------------
+Set M
+
+Worst ACO: M-n151-k12
+(Christophides et al, No of trucks: 12, Best value: 1053)
+Etalon: 1015. Found: 1326
+Percent: 30.6404
+
+Best ACO: M-n121-k7
+(Christophides et al, No of trucks: 7, Optimal value: 1034)
+Etalon: 1034. Found: 1201
+Percent: 16.1509
+
+
+
+Worst PSO: M-n200-k16
+(From Christophides et al, No of trucks: 16)
+Best: 1274. Found: 2439
+Percent: 91.4443
+
+Best PSO: M-n101-k10
+(Christophides et al, No of trucks: 10, Optimal value: 820)
+Best: 820. Found: 1281
+Percent: 56.2195
+
+
+Average time ACO: 117373
+Average time PSO: 36274.6
+
+Percent ACO: 24.1947
+Percent PSO: 67.5991

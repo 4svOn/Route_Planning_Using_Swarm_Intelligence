@@ -22,7 +22,7 @@ namespace osrm {
     private:
         template <typename TRequest, typename TResponse>
         std::optional<TResponse> MakeRequest(const TRequest& osrmRequest){
-            userver::clients::http::Request request = HttpClient_.CreateRequest().get().timeout(1000).retry(2);
+            userver::clients::http::Request request = HttpClient_.CreateRequest().get().timeout(5000).retry(2);
             request.url(osrmRequest.GetUrlFull());
             LOG_INFO() << "OSRM request: " << request.GetUrl();
             try {

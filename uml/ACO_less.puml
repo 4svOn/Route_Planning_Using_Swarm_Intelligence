@@ -1,0 +1,62 @@
+@startuml
+skinparam nodesep 5
+skinparam ranksep 15
+' top to bottom direction
+
+' Core Classes
+class SI.ACO.TSolver {
+  +Solve(): CVRP.TSolution
+  +GetBestDistance(): TDistance
+  __
+  -Manages ants and pheromones
+}
+
+class SI.ACO.TAnt {
+  +ConstructSolution()
+  +GetRoutes()
+  +TotalDistance()
+  __
+  -Builds routes probabilistically
+}
+
+class SI.ACO.TParameters {
+  +PheromoneImportance
+  +DistanceImportance
+  +EvaporateRate
+}
+
+class CVRP.TProblem {
+  +NodesCount()
+  +Distance()
+  +Depot()
+}
+
+' Templated Types
+class SI.ACO.TPheromoneMatrix << (T) >> {
+  std::vector<std::vector<double>>
+}
+
+class CVRP.TRoutes << (T) >> {
+  std::vector<std::vector<TNode>>
+}
+
+' Relationships - Vertical Flow
+SI.ACO.TSolver -right-> SI.ACO.TParameters : "uses\nconfiguration"
+SI.ACO.TSolver -down-> SI.ACO.TAnt : "1..*\nmanages"
+SI.ACO.TSolver -up-> SI.ACO.TPheromoneMatrix : "maintains"
+
+SI.ACO.TAnt --> CVRP.TProblem : "references"
+SI.ACO.TAnt --> CVRP.TRoutes : "builds"
+
+SI.ACO.TSolver --> CVRP.TProblem : "contains"
+
+' Hide namespace boxes
+hide namespace
+namespace SI.ACO {
+}
+namespace CVRP {
+}
+
+' Make arrows straight
+skinparam linetype ortho
+@enduml

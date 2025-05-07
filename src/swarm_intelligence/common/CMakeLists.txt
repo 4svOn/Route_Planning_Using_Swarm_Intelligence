@@ -5,8 +5,10 @@ set(LIB_NAME ${PROJECT_NAME}_SI_common)
 add_library(${LIB_NAME} STATIC
     # include/util.hpp
     src/CVRP_problem.cpp
+    src/instance_reader.cpp
     src/node.cpp
     src/types.cpp
+    src/two_opt.cpp
 )
 
 target_include_directories(${LIB_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,0 +1,109 @@
+@startuml CVRP_Component_Class_Diagram
+
+title CVRP Component Class Diagram
+
+skinparam nodesep 10
+skinparam ranksep 30
+top to bottom direction
+
+namespace SI::CVRP {
+
+class TNode {
+  + TNodeID ID
+  + TCapacity Demand
+  + TNode()
+  + TNode(TNodeID, TCapacity)
+  + TNode(const pb::Customer&, int64_t)
+  + operator==(const TNode&)
+  + operator!=(const TNode&)
+  + operator<(const TNode&)
+  + CreateDummy(int64_t)
+}
+
+class TNodeWithCoordinate {
+  + base::Coordinate Coordinate
+  + TNodeWithCoordinate(const TNode&, const base::Coordinate&)
+}
+
+class TNodesWithCoordinates {
+  + TNodesWithCoordinates(const std::vector<TNode>&)
+  + TNodesWithCoordinates(const pb::Request&)
+  + Nodes() const
+  + Coordinates() const
+  + Node(int64_t) const
+  + Coordinate(int64_t) const
+}
+
+class TProblem {
+  + TProblem(const TNodesWithCoordinates&, const TDurationTable&, const TDistanceTable&)
+  + NodesCount() const
+  + CustomersCount() const
+  + Customers() const
+  + Depot() const
+  + Capacity() const
+  + Nodes() const
+  + Duration(const TNode&, const TNode&) const
+  + Distance(const TNode&, const TNode&) const
+}
+
+class TSolution {
+  + TSolution(const TProblem&, const TRoutes&, int64_t)
+  + Problem() const
+  + Routes() const
+  + TotalDistance() const
+  + RouteWithCoordinates(const TRoute&) const
+  + RouteWithCoordinates(int64_t) const
+  + operator<(const TSolution&) const
+}
+
+class TRouteIterator {
+  + TRouteIterator()
+  + TRouteIterator(const TSolution*, const TRoute*)
+  + operator++()
+  + operator*()
+  + operator==(const TRouteIterator&)
+  + operator!=(const TRouteIterator&)
+}
+
+class TFileInstanceReader {
+  + TFileInstanceReader(const std::string&)
+  + ~TFileInstanceReader()
+  + Read()
+  - ReadBaseInfo(const std::string&)
+  - ReadNodes(const std::string&)
+  - ReadDemands(const std::string&)
+  - ReadDepot(const std::string&)
+  - CalcDistanceTable()
+  - CalcDistance(const Coord&, const Coord&)
+}
+
+' class TRoute << (T,#FF7700) >> {
+' std::vector<TNode>
+' }
+' class TRoutes << (T,#FF7700) >> {
+' std::vector<TRoute>
+' }
+' class TNodesSet << (T,#FF7700) >> {
+' std::set<TNode>
+' }
+' class TDurationTable << (T,#FF7700) >> {
+' std::vector<std::vector<TDuration>>
+' }
+' class TDistanceTable << (T,#FF7700) >> {
+' std::vector<std::vector<TDistance>>
+' }
+' class TCapacities << (T,#FF7700) >> {
+' std::vector<TCapacity>
+' }
+
+TNode <|-- TNodeWithCoordinate
+TNodesWithCoordinates o-- TNode
+TProblem o-- TNodesWithCoordinates
+' TSolution o-- TProblem
+TProblem -down-o TSolution
+TSolution o-- TRouteIterator
+TFileInstanceReader --> TProblem
+
+}
+
+@enduml

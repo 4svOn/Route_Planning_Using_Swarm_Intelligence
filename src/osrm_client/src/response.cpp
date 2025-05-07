@@ -47,7 +47,7 @@ namespace osrm {
         , Request_(request)
     {
         if (!IsOk()) {
-            LOG_INFO() << GetLogString();
+            LOG_ERROR() << GetLogString();
             return;
         }
         Polyline_ = JsonResponse_["routes"][0]["geometry"].As<std::string>();

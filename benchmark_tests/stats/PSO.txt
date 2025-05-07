@@ -1,0 +1,48 @@
+struct TParameters {
+    static constexpr double MAX_W = 0.6;
+    static constexpr double MIN_W = 0.1;
+
+    int64_t SwarmSize = 25;
+    int64_t MaxIterations = 10000;
+    double W = 0.6;
+    double C1 = 0.25;
+    double C2 = 0.15;
+    double M = 0.1;
+    int64_t MaxIterationsWitoutImprovement = 1000;
+};
+
+Percent PSO: 25.4931
+
+
+
+struct TParameters {
+    static constexpr double MAX_W = 0.6;
+    static constexpr double MIN_W = 0.1;
+
+    int64_t SwarmSize = 25;
+    int64_t MaxIterations = 10000;
+    double W = 0.4;
+    double C1 = 0.3;
+    double C2 = 0.3;
+    double M = 0.1;
+    int64_t MaxIterationsWitoutImprovement = 1000;
+};
+
+Percent PSO: 24.9189
+
+
+
+struct TParameters {
+    static constexpr double MAX_W = 0.6;
+    static constexpr double MIN_W = 0.1;
+
+    int64_t SwarmSize = 25;
+    int64_t MaxIterations = 10000;
+    double W = 0;
+    double C1 = 0.5;
+    double C2 = 0.5;
+    double M = 0.1;
+    int64_t MaxIterationsWitoutImprovement = 1000;
+};
+
+Percent PSO: 20.9197

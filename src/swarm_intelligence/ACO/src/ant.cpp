@@ -33,6 +33,10 @@ namespace SI::ACO {
         return totalDistance;
     }
 
+    CVRP::TRoutes& TAnt::GetRoutes() {
+        return Routes_;
+    }
+
     const CVRP::TRoutes& TAnt::GetRoutes() const {
         return Routes_;
     }
@@ -78,8 +82,15 @@ namespace SI::ACO {
         const auto& curNode = Routes_.back().back();
         std::vector <double> probabilities;
         for (const auto& customer : feasibleCustomers) {
-            double q = std::pow(pheromones[curNode.ID][Problem_.Depot().ID], parameters.PheromonceImportance)
-                     * std::pow(1 / static_cast<double>(Problem_.Distance(curNode, customer)), parameters.DistanceImportance);
+            double q = std::pow(pheromones[curNode.ID][Problem_.Depot().ID], parameters.PheromonceImportance);
+            q *= std::pow(1. / static_cast<double>(Problem_.Distance(curNode, customer)), parameters.DistanceImportance);
+            // {
+            //     double toDepot = static_cast<double>(Problem_.Distance(curNode, Problem_.Depot()));
+            //     double fromDepot = static_cast<double>(Problem_.Distance(Problem_.Depot(), customer));
+            //     double toCustomer = static_cast<double>(Problem_.Distance(curNode, customer));
+            //     double value = toDepot + fromDepot - parameters.G * toCustomer - parameters.F * std::abs(toCustomer - fromDepot);
+            //     q *= std::pow(value, parameters.DistanceImportance);
+            // }
             probabilities.emplace_back(q);
             sum += q;
         }

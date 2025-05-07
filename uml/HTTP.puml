@@ -1,0 +1,30 @@
+@startuml
+' skinparam nodesep 5
+' skinparam ranksep 15
+' left to right direction
+top to bottom direction
+
+component Клиент as client
+component Сервер as server
+
+cloud OSRM {
+    [OSRM API]
+}
+
+cloud Nominatim {
+    [Nominatim API]
+}
+
+cloud OSM {
+    [OSM Tiles API]
+}
+
+client -up-> OSM : HTTP GET /tiles/{z}/{x}/{y}.png\n(запрос тайлов карты)
+client -right-> Nominatim : HTTP GET /reverse?lat={lat}&lon={lon}&format=json\n(обратное геокодирование адреса)
+
+client -down-> server : HTTP POST /cvrp-solve\n{Protobuf с условием задачи}
+server -right-> OSRM : HTTP GET /table/v1/driving/{coordinates}\n(матрица расстояний)
+server -right-> OSRM : HTTP GET /route/v1/driving/{coordinates}\n(расчёт маршрута)
+server -up-> client : Решение задачи алгоритмами ACO и PSO\n{Protobuf с решением задачи}
+
+@enduml

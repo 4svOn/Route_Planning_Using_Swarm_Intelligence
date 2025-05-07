@@ -7,10 +7,17 @@ import "common.proto";
 message Route {
   // repeated pb.Coordinate points = 1;
   string polyline = 1;
+  repeated int64 uids = 2;
 }
 
-message Response {
+message CVRP_Solution {
   repeated Route routes = 1;
   int64 total_distance = 2;
   pb.Algorithm algorithm = 3;
+}
+
+message Response {
+  CVRP_Solution ACO_solution = 1;
+  CVRP_Solution PSO_solution = 2;
+  pb.Algorithm better_algorithm = 3;
 }

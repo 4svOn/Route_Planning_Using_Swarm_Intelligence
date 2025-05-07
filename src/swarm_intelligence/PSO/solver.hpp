@@ -15,11 +15,11 @@ namespace SI::PSO {
         TDistance GetBestDistance() const;
 
     private:
-
         CVRP::TRoutes ConstructBestRoutes() const;
+        void TwoOpt();
 
     private:
-        CVRP::TProblem Problem_;
+        const CVRP::TProblem& Problem_;
         TParameters Parameters_;
 
         std::vector<TParticle> Particles_;
