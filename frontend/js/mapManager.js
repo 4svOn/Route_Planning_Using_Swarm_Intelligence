@@ -24,7 +24,7 @@ export class MapManager {
     };
   }
 
-  _createLayer(name) {
+  _createLayer() {
     const source = new VectorSource();
     const layer = new VectorLayer({ source });
     this.map.addLayer(layer);
@@ -37,6 +37,6 @@ export class MapManager {
 
   centerMap(center) {
     this.map.getView().setCenter(center);
-    this.map.getView().setZoom(12);
+    // this.map.getView().setZoom(12);
   }
 }

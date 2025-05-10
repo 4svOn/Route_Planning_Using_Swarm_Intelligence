@@ -1,0 +1,65 @@
+@startuml
+
+title Protobuf messages diagram
+
+' skinparam nodesep 5
+' skinparam ranksep 15
+' left to right direction
+top to bottom direction
+
+' Common.proto
+enum Algorithm <<proto>> {
+  UNSPECIFIED = 0
+  ACO = 1
+  PSO = 2
+  BOTH = 3
+}
+
+class Coordinate <<proto>> {
+  +double longitude : 1
+  +double latitude : 2
+}
+
+' Request.proto
+class Customer <<proto>> {
+  +Coordinate coordinate : 1
+  +int64 demand : 2
+  +int64 uid : 3
+}
+
+class Request <<proto>> {
+  +Customer depot : 1
+  +repeated Customer customers : 2
+  +Algorithm algorithm : 3
+  +int64 timestamp : 777
+}
+
+' Response.proto
+class Route <<proto>> {
+  +string polyline : 1
+  +repeated int64 uids : 2
+}
+
+class CVRP_Solution <<proto>> {
+  +repeated Route routes : 1
+  +int64 total_distance : 2
+  +Algorithm algorithm : 3
+}
+
+class Response <<proto>> {
+  +CVRP_Solution ACO_solution : 1
+  +CVRP_Solution PSO_solution : 2
+  +Algorithm better_algorithm : 3
+}
+
+' Relationships
+Coordinate -down-> Customer : composition
+Request *-right- "1..*" Customer : customers
+Request -down-> Algorithm : uses
+CVRP_Solution -up-> Algorithm : uses
+CVRP_Solution *-up- "1..*" Route : routes
+Response -right-> CVRP_Solution : ACO_solution
+Response -right-> CVRP_Solution : PSO_solution
+Response -up-> Algorithm : uses
+
+@enduml

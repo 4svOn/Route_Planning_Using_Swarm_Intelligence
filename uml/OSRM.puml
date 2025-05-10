@@ -1,0 +1,63 @@
+@startuml
+
+title OSRM Library Class Diagram
+
+top to bottom direction
+' left to right direction
+
+
+class TClient {
+    - userver::clients::http::Client& HttpClient_
+
+    + std::optional<ResponseRoute> MakeRouteRequest(const RequestRoute& request);
+    + std::optional<ResponseTable> MakeTableRequest(const RequestTable& request);
+}
+class TRequest {
+    - Coordinates_
+    - Service_
+    - Profile_
+
+    {abstract} + GetFullUrl()
+}
+class TRequestRoute {
+    - Overview_
+
+    + GetFullUrl()
+}
+class TRequestTable {
+    - Annotations_
+
+    + GetFullUrl()
+}
+class TResponse {
+    # userver::formats::json::Value JsonResponse_
+    - std::string Code_
+    - std::string Message_
+
+    + std::string GetLogString()
+    + bool IsOk()
+}
+class TResponseRoute {
+    - const RequestRoute& Request_
+    - std::string Polyline_
+    + const std::string& GetPolyline()
+}
+class TResponseTable {
+    - const RequestTable& Request_
+    - TDurationTable DurationTable_
+    - TDistanceTable DistanceTable_
+
+    + uint64_t GetSize();
+    + const TDurationTable& GetDurationTable();
+    + const TDistanceTable& GetDistanceTable();
+}
+
+TRequestRoute <|-- TClient: принимает >
+TRequestTable <|-- TClient: принимает >
+TResponseRoute <|-- TClient: возвращает <
+TResponseTable <|-- TClient: возвращает <
+TRequest --> TRequestRoute
+TRequest --> TRequestTable
+TResponse --> TResponseRoute
+TResponse --> TResponseTable
+@enduml

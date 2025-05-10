@@ -2,6 +2,8 @@
 
 #include <base/random.hpp>
 
+# include <swarm_intelligence/common/two_opt.hpp>
+
 #include <algorithm>
 #include <cmath>
 #include <iostream>
@@ -62,6 +64,11 @@ namespace SI::ACO {
 
         Routes_.pop_back();
     }
+
+    void TAnt::MakeTwoOpt() {
+        SI::TwoOpt(Problem_, Routes_);
+    }
+
 
     void TAnt::VisitCustomer(const CVRP::TNode& customer) {
         VisitedCustomers_.emplace(customer);

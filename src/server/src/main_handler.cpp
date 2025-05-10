@@ -41,7 +41,7 @@ namespace {
 
     class MainHandler final : public userver::server::handlers::HttpHandlerBase {
     public:
-        static constexpr std::string_view kName = "handler-hello";
+        static constexpr std::string_view kName = "handler-cvrp-solve";
 
         using HttpHandlerBase::HttpHandlerBase;
 
@@ -60,24 +60,14 @@ namespace {
             response.SetHeader(userver::http::headers::kAccessControlAllowHeaders, "Content-Type, Cache-Control, Pragma, Expires");
             response.SetContentType("application/octet-stream");
 
-            // LOG_INFO() << request.GetUrl();
-            // LOG_INFO() << request.RequestBody();
-            // LOG_INFO() << request_context.GetUserData<std::string>();
-
             if (request.GetMethod() == userver::server::http::HttpMethod::kPost) {
-                pb::Request requestBodyPb = ParseRequestBody(request.RequestBody());
-
-                LOG_INFO() << "REQUEST: " << request.RequestBody();
-
-                SI::CVRP::TNodesWithCoordinates nodes{requestBodyPb};
-
-                osrm::ResponseTable tableResponse = SendTableRequest(nodes);
-                SI::CVRP::TProblem problem{nodes, tableResponse.GetDurationTable(), tableResponse.GetDistanceTable()};
-
-
                 try {
+                    pb::Request requestBodyPb = ParseRequestBody(request.RequestBody());
+                    SI::CVRP::TNodesWithCoordinates nodes{requestBodyPb};
+                    osrm::ResponseTable tableResponse = SendTableRequest(nodes);
+                    SI::CVRP::TProblem problem{nodes, tableResponse.GetDurationTable(), tableResponse.GetDistanceTable()};
                     pb::Response response_pb = PrepareResponse(SolveCVRP(problem, requestBodyPb.algorithm()));
-                    // LOG_INFO() << "RESPONSE: " << response_pb.DebugString();
+
                     std::string res;
                     response_pb.SerializeToString(&res);
                     return res;
@@ -185,6 +175,7 @@ namespace {
                     return std::make_pair(pb::Algorithm::ACO, SI::ACO::TSolver{problem, SI::ACO::TParameters{}}.Solve());
                 }));
             }
+            
             if (algo == pb::Algorithm::PSO || algo == pb::Algorithm::BOTH) {
                 tasks.push_back(userver::utils::Async("CVRP_SOLVING", [&problem, this] {
                     return std::make_pair(pb::Algorithm::PSO, SI::PSO::TSolver{problem, SI::PSO::TParameters{}}.Solve());
@@ -209,14 +200,6 @@ namespace {
     };
 
 } // namespace
-
-std::string SayHelloTo(std::string_view name) {
-    if (name.empty()) {
-    name = "unknown user";
-    }
-
-    return fmt::format("MainHandler, {}!\n", name);
-}
 
 void AppendMainHandler(userver::components::ComponentList &component_list) {
     component_list.Append<MainHandler>();

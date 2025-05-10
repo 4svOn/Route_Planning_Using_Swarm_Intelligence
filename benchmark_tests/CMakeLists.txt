@@ -1,9 +1,27 @@
 cmake_minimum_required(VERSION 3.14)
 project(Route_Planning_Using_Swarm_Intelligence_Benchmark_Tests CXX)
 
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
 
 add_executable(${PROJECT_NAME} main.cpp)
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    # Основные оптимизации
+    target_compile_options(Route_Planning_Using_Swarm_Intelligence_Benchmark_Tests PRIVATE
+        -O3               # Агрессивная оптимизация
+        -march=native     # Использовать инструкции текущего процессора
+        -flto             # Межмодульная оптимизация (LTO)
+        -ffast-math       # Быстрая (но менее точная) математика
+        -funroll-loops    # Разворот циклов
+        -fomit-frame-pointer # Убрать указатели кадра для скорости
+    )
+    # Включите LTO на этапе линковки
+    target_link_options(Route_Planning_Using_Swarm_Intelligence_Benchmark_Tests PRIVATE -flto)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
 
 # Add these include directories before adding subdirectories
 include_directories(

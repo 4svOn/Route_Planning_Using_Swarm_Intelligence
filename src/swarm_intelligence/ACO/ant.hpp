@@ -23,6 +23,8 @@ namespace SI::ACO {
 
         void ConstructSolution(const TParameters& parameters, const TPheromoneMatrix& pheromones); // Build routes probabilistically
 
+        void MakeTwoOpt();
+
     private:
         // std::vector<size_t> GetAllFeasibleUnvisitedCustomers() const;
         void VisitCustomer(const CVRP::TNode& customer);

@@ -34,7 +34,7 @@ namespace SI::PSO {
         // }
     }
 
-    TParticle::TParticle(const CVRP::TProblem& problem, const std::vector<TCoordinate>& position)
+    TParticle::TParticle(const CVRP::TProblem& problem, const TCoordinates& position)
         : Problem_(problem)
         , Position_(position)
     {
@@ -94,15 +94,15 @@ namespace SI::PSO {
         return BestDistance_;
     }
 
-    const std::vector<TCoordinate>& TParticle::BestPosition() const {
+    const TCoordinates& TParticle::BestPosition() const {
         return BestPosition_;
     }
 
-    void TParticle::TwoOpt() {
-        BestDistance_ = TParticle::TwoOpt(Problem_, BestPosition_, BestDistance_);
+    void TParticle::MakeTwoOpt() {
+        BestDistance_ = TParticle::MakeTwoOpt(Problem_, BestPosition_, BestDistance_);
     }
 
-    void TParticle::Update(const TParameters& parameters, const std::vector<TCoordinate>& bestGlobalPosition, bool isDebugPrint) {
+    void TParticle::Update(const TParameters& parameters, const TCoordinates& bestGlobalPosition, bool isDebugPrint) {
         if (IterationsWithoutImprovement_ >= 100) {
             Position_ = RandomPermutation(Position_.size());
             Evaluate();
@@ -143,10 +143,10 @@ namespace SI::PSO {
         }
     }
 
-    void TParticle::InsertSegment(const std::vector<TCoordinate>& source, size_t start, size_t end) {
+    void TParticle::InsertSegment(const TCoordinates& source, size_t start, size_t end) {
         // Копируем сегмент
         assert(end <= source.size());
-        std::vector<TCoordinate> segment(source.begin() + start, source.begin() + end);
+        TCoordinates segment(source.begin() + start, source.begin() + end);
 
         // Удаляем клиенты из сегмента из текущей позиции
         for (auto customer : segment) {
@@ -163,7 +163,7 @@ namespace SI::PSO {
 
     void TParticle::Repair() {
         std::unordered_set<TCoordinate> unique;
-        std::vector<TCoordinate> repaired;
+        TCoordinates repaired;
 
         // Удаление дубликатов
         for (auto customer : Position_) {
@@ -218,7 +218,7 @@ namespace SI::PSO {
         stream << std::endl;
     }
 
-    TDistance TParticle::TwoOpt(const CVRP::TProblem& problem, std::vector<TCoordinate>& position, TDistance oldBestDistance) {
+    TDistance TParticle::MakeTwoOpt(const CVRP::TProblem& problem, TCoordinates& position, TDistance oldBestDistance) {
         TParticle particle{problem, position};
 
         CVRP::TRoutes routes = particle.GetRoutes();

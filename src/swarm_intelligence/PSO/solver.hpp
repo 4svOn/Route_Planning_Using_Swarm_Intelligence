@@ -16,14 +16,13 @@ namespace SI::PSO {
 
     private:
         CVRP::TRoutes ConstructBestRoutes() const;
-        void TwoOpt();
 
     private:
         const CVRP::TProblem& Problem_;
         TParameters Parameters_;
 
         std::vector<TParticle> Particles_;
-        std::vector<TCoordinate> BestPosition_;
+        TCoordinates BestPosition_;
         TDistance BestDistance_;
     };
 }

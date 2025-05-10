@@ -6,6 +6,7 @@
 namespace SI::PSO {
 
     using TCoordinate = int32_t;
+    using TCoordinates = std::vector<TCoordinate>;
 
     struct TParameters {
         static constexpr double MAX_W = 0.6;

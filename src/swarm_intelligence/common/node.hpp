@@ -55,7 +55,7 @@ namespace SI::CVRP {
     private:
         std::vector<TNode> Nodes_;
         base::Coordinates Coordinates_;
-        std::vector<int64_t> UIDFromFrontend_;
+        std::vector<int64_t> UIDsFromFrontend_;
 
     };
 

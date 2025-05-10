@@ -1,0 +1,79 @@
+@startuml
+
+title Frontend Class Diagram
+
+skinparam nodesep 50
+skinparam ranksep 30
+' skinparam classFontSize 13
+skinparam linetype ortho
+' left to right direction
+
+class App {
+  + handleRequest()
+  + displaySolution(solution)
+  + handleMapClick(event)
+  + clearAll()
+  + showError(message)
+  + hideError()
+  # _initEventListeners()
+  # _setupMapInteractions()
+}
+
+class ApiClient {
+  + sendRequest()
+  + getSolution(algorithm)
+  + getBetterSolution()()
+  # _validateRequest(customers, depot)
+  # _createCustomerProto(marker)
+  - protoConfig
+  - SERVER_URL
+}
+
+class RouteManager {
+  - routesMapFeatures: Map
+  - colors: Array
+  + drawRoute(polylineStr, index, uids)
+  + highlightRoute(feature)
+  + unhighlightAllRoutes()
+  + clearRoutes()
+  # _createRouteStyle(index)
+}
+
+class MarkerManager {
+  - markersMap: Map
+  - styles: Map
+  + addMarker(coordinates)
+  + clearMarkers(type)
+  + reloadMarkersOnMap()
+  + removeMarker(feature)
+  + addMarkerToSidePanel(feature, title, listToAdd, isClickable)
+  + updateMarkersList()
+  + getMarkerFeature(uid)
+  + getMarkersData(type)
+  + getAddressFromCoordinates(coords, uid)
+  # _formatAddress(address)
+  # _createStyle(iconUrl, scale)
+}
+
+class MapManager {
+  - map: ol.Map
+  - layers: Map
+  + getLayer(name)
+  + centerMap(center)
+  # _createLayer(name)
+}
+
+App --> MapManager
+App --> MarkerManager
+App --> RouteManager
+App --> ApiClient
+
+ApiClient --> MapManager
+ApiClient --> MarkerManager
+ApiClient --> RouteManager
+
+RouteManager --> MapManager
+RouteManager --> MarkerManager
+
+MarkerManager --> MapManager
+@enduml

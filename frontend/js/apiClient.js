@@ -1,17 +1,11 @@
 export class ApiClient {
     constructor(protoConfig, mapManager, markerManager, routeManager) {
-      this.proto = protoConfig;
-      this.SERVER_URL = 'http://localhost:8081/hello';
+      this.protoConfig = protoConfig;
+      this.SERVER_URL = 'http://localhost:8080/cvrp-solve';
       this.mapManager = mapManager;
       this.markerManager = markerManager;
       this.routeManager = routeManager;
-      this.betterSolution = this.proto.Algorithm.values.UNSPECIFIED;
-    }
-
-    _bufferToHex(buffer) {
-      return Array.from(new Uint8Array(buffer))
-        .map(b => b.toString(16).padStart(2, '0'))
-        .join(' ');
+      this.betterSolution = this.protoConfig.Algorithm.values.UNSPECIFIED;
     }
 
     async sendRequest() {
@@ -20,14 +14,14 @@ export class ApiClient {
       this._validateRequest(customers, depots);
       const depot = depots[0];
 
-      const request = this.proto.Request.create({
+      const request = this.protoConfig.Request.create({
         depot: this._createCustomerProto(depot),
         customers: customers.map(c => this._createCustomerProto(c)),
         timestamp: Date.now(),
-        algorithm: this.proto.Algorithm.values.BOTH,
+        algorithm: this.protoConfig.Algorithm.values.BOTH,
       });
 
-      const requestBuffer = this.proto.Request.encode(request).finish();
+      const requestBuffer = this.protoConfig.Request.encode(request).finish();
 
       try {
         const response = await fetch(this.SERVER_URL, {
@@ -56,7 +50,7 @@ export class ApiClient {
         const binaryResponse = new Uint8Array(arrayBuffer);
         // console.log('Response Uint8Array:', binaryResponse);
 
-        const decodedProto = this.proto.Response.decode(binaryResponse);
+        const decodedProto = this.protoConfig.Response.decode(binaryResponse);
         this.ACOSolution = decodedProto.ACOSolution;
         this.PSOSolution = decodedProto.PSOSolution;
         this.betterSolution = decodedProto.betterAlgorithm;
@@ -67,18 +61,18 @@ export class ApiClient {
     }
 
     getSolution(algorithm) {
-      if (algorithm === this.proto.Algorithm.values.ACO) {
+      if (algorithm === this.protoConfig.Algorithm.values.ACO) {
         return this.ACOSolution;
-      } else if (algorithm === this.proto.Algorithm.values.PSO) {
+      } else if (algorithm === this.protoConfig.Algorithm.values.PSO) {
         return this.PSOSolution;
       }
     }
 
     getBetterSolution() {
-      if (!this.betterSolution || this.betterSolution === this.proto.Algorithm.values.UNSPECIFIED) {
+      if (!this.betterSolution || this.betterSolution === this.protoConfig.Algorithm.values.UNSPECIFIED) {
         return null;
       }
-      if (this.betterSolution == this.proto.Algorithm.values.ACO) {
+      if (this.betterSolution == this.protoConfig.Algorithm.values.ACO) {
         return this.ACOSolution;
       } else {
         return this.PSOSolution;
@@ -96,16 +90,23 @@ export class ApiClient {
 
       const vehicleCapacity = depot[0].demand;
 
+      if (vehicleCapacity <= 0) {
+        throw new Error('Vehicle capacity can not be negative or zero');
+      }
+
       for (const customer of customers) {
         if (customer.demand > vehicleCapacity) {
           throw new Error('Customer demand is greater than vehicle capacity');
+        }
+        if (customer.demand <= 0) {
+          throw new Error('Customer demand can not be negative or zero');
         }
       }
     }
 
     _createCustomerProto(marker) {
-      return this.proto.Customer.create({
-        coordinate: this.proto.Coordinate.create({
+      return this.protoConfig.Customer.create({
+        coordinate: this.protoConfig.Coordinate.create({
           longitude: marker.coordinates[0],  // явно передаём longitude
           latitude: marker.coordinates[1],    // явно передаём latitude
         }),

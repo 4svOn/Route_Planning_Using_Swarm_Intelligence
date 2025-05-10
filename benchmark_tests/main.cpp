@@ -208,15 +208,17 @@ void SearchBestPso(const std::string& path) {
 }
 
 int main(int argc, char* argv[]) {
-    // std::string filename;
-    // if (argc > 1) {
-    //     filename = argv[1];
-    // } else {
-    //     std::cout << "Filename with instance not specified" << std::endl;
-    //     return 0;
-    // }
+    std::string path;
+    if (argc > 1) {
+        path = argv[1];
+    } else {
+        std::cout << "Path with instance not specified" << std::endl;
+        return 0;
+    }
 
-    std::string path = "../instances/Vrp-Set-B/";
+    if (path.back() != '/') {
+        path += '/';
+    }
 
     // SearchBestPso(path);
     // return 0;

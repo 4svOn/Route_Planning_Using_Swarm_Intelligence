@@ -31,7 +31,8 @@ export class RouteManager {
       geometry: new LineString(points),
       routeIndex: index,
       type: 'route',
-      style: style
+      style: style,
+      isHighlighted: false
     });
 
     feature.setStyle(style);
@@ -47,6 +48,7 @@ export class RouteManager {
       style.setZIndex(997); // Устанавливаем высокий z-index
       style.getStroke().setWidth(4);
       f.setStyle(style);
+      f.set('isHighlighted', false);
     });
 
     this.markerManager.reloadMarkersOnMap();
@@ -76,6 +78,8 @@ export class RouteManager {
     style.setZIndex(998); // Устанавливаем высокий z-index
     style.getStroke().setWidth(7);
     feature.setStyle(style);
+
+    feature.set('isHighlighted', true);
 
     this.listContainer.innerHTML = '';
 

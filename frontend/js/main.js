@@ -30,7 +30,7 @@ export class App {
       this.markerType = e.target.checked ? 'depot' : 'customer';
     });
     document.getElementById('toggle-button-aco-pso').addEventListener('change', (e) => {
-      this.algorithm = e.target.checked ? this.apiClient.proto.Algorithm.values.PSO : this.apiClient.proto.Algorithm.values.ACO;
+      this.algorithm = e.target.checked ? this.apiClient.protoConfig.Algorithm.values.PSO : this.apiClient.protoConfig.Algorithm.values.ACO;
       this.displaySolution(this.apiClient.getSolution(this.algorithm));
     });
   }
@@ -41,7 +41,6 @@ export class App {
   }
 
   handleMapClick(event) {
-    this.routeManager.unhighlightAllRoutes();
     const clickedFeature = this.mapManager.map.forEachFeatureAtPixel(
       event.pixel,
       (feature) => feature
@@ -49,6 +48,12 @@ export class App {
 
     if (clickedFeature) {
       if (clickedFeature.get('type') === 'route') {
+        if (clickedFeature.get('isHighlighted')) {
+          console.log(clickedFeature);
+          this.routeManager.unhighlightAllRoutes();
+          return;
+        }
+        this.routeManager.unhighlightAllRoutes();
         this.routeManager.highlightRoute(clickedFeature);
         return;
       }
@@ -57,6 +62,7 @@ export class App {
       return;
     }
 
+    this.routeManager.unhighlightAllRoutes();
     this.markerManager.addMarker(event.coordinate);
   }
 
@@ -84,18 +90,14 @@ export class App {
     this.routeManager.clearRoutes();
 
     this.algorithm_toggle.classList.remove('hidden-element');
-    document.getElementById('toggle-button-aco-pso').checked = solution.algorithm === this.apiClient.proto.Algorithm.values.PSO;
+    document.getElementById('toggle-button-aco-pso').checked = solution.algorithm === this.apiClient.protoConfig.Algorithm.values.PSO;
 
     solution.routes.forEach((route, index) => {
       this.routeManager.drawRoute(route.polyline, index, route.uids);
     });
 
-    this._showResults(solution);
-  }
-
-  _showResults(solution) {
     const totalDistance = parseInt(solution.totalDistance);
-    const algoText = solution.algorithm === this.apiClient.proto.Algorithm.values.ACO ? "ACO" : "PSO";
+    const algoText = solution.algorithm === this.apiClient.protoConfig.Algorithm.values.ACO ? "ACO" : "PSO";
 
     this.popupValue.textContent = `Total distance: ${totalDistance / 1000} km\nSolved by ${algoText}`;
     this.popup.classList.add('show');

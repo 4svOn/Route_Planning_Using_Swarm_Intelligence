@@ -12,7 +12,7 @@ namespace SI::PSO {
 
     public:
         TParticle(const CVRP::TProblem& problem);
-        TParticle(const CVRP::TProblem& problem, const std::vector<TCoordinate>& position);
+        TParticle(const CVRP::TProblem& problem, const TCoordinates& position);
 
         TParticle(const TParticle& other) = default;
         TParticle& operator=(const TParticle& other) = default;
@@ -23,25 +23,25 @@ namespace SI::PSO {
 
         TDistance Evaluate();
         TDistance BestDistance() const;
-        const std::vector<TCoordinate>& BestPosition() const;
+        const TCoordinates& BestPosition() const;
 
-        void TwoOpt();
+        void MakeTwoOpt();
 
-        void Update(const TParameters& parameters, const std::vector<TCoordinate>& bestGlobalPosition, bool isDebugPrint = false);
+        void Update(const TParameters& parameters, const TCoordinates& bestGlobalPosition, bool isDebugPrint = false);
         void DebugPrint(std::ostream& stream);
 
-        static TDistance TwoOpt(const CVRP::TProblem& problem, std::vector<TCoordinate>& position, TDistance oldBestDistance);
+        static TDistance MakeTwoOpt(const CVRP::TProblem& problem, TCoordinates& position, TDistance oldBestDistance);
 
     private:
-        void InsertSegment(const std::vector<TCoordinate>& source, size_t start, size_t end);
+        void InsertSegment(const TCoordinates& source, size_t start, size_t end);
         void Repair();
 
     private:
         const CVRP::TProblem& Problem_;
         CVRP::TRoutes Routes_; // Routes for multiple vehicles
-        std::vector<TCoordinate> Position_;
-        std::vector<TCoordinate> Velocity_;
-        std::vector<TCoordinate> BestPosition_;
+        TCoordinates Position_;
+        TCoordinates Velocity_;
+        TCoordinates BestPosition_;
         TDistance BestDistance_; // Best total distance for this particle
         int64_t IterationsWithoutImprovement_;
     };

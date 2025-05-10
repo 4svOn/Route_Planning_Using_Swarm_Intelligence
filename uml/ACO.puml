@@ -11,44 +11,45 @@ set separator none
 namespace SI::ACO {
 
     class TParameters {
-        +PheromonceImportance: double = 1.0
-        +DistanceImportance: double = 5.0
-        +EvaporateRate: double = 0.01
-        +ProbabalisticBorder: double = 0.7
-        +AntsPerIteration: int64_t = 50
-        +MaxIterations: int64_t = 5000
+        +PheromonceImportance: = 1.0
+        +DistanceImportance = 5.0
+        +EvaporateRate = 0.01
+        +ProbabalisticBorder = 0.5
+        +AntsPerIteration = 50
+        +MaxIterations = 5000
+        +MaxIterationsWithoutImprovement = 500
     }
 
     class TSolver {
         +TSolver(CVRP::TProblem, TParameters)
-        +Solve(): CVRP::TSolution
-        +GetBestDistance(): TDistance
-        -InitializePheromones(): void
-        -EvaporatePheromones(ant: TAnt): void
-        -DepositPheromones(ant: TAnt): void
-        -Problem_: CVRP::TProblem
-        -Parameters_: TParameters
-        -Ants_: std::vector<TAnt>
-        -Pheromones_: TPheromoneMatrix
-        -BasePheromone_: double = 1.0
-        -BestDistance_: TDistance = -1
-        -BestAntIndex_: int64_t = -1
+        +CVRP::TSolution Solve()
+        +GetBestDistance()
+        -InitializePheromones()
+        -EvaporatePheromones(TAnt)
+        -DepositPheromones(TAnt)
+        -CVRP::TProblem Problem
+        -TParameters Parameters
+        -std::vector<TAnt> Ants
+        -TPheromoneMatrix Pheromones
+        -TDistance BestDistance
+        -int64_t BestAntIndex
     }
 
     class TAnt {
-        +TAnt(problem: CVRP::TProblem&)
-        +Reset(): void
-        +TotalDistance(): TDistance
-        +GetRoutes(): CVRP::TRoutes
-        +ructSolution(TParameters, TPheromoneMatrix): void
-        -VisitCustomer(CVRP::TNode): void
-        -ReturnToDepot(): void
-        -SelectNextCustomer(..): CVRP::TNode
-        -Problem_:  CVRP::TProblem
-        -Routes_: CVRP::TRoutes
-        -VisitedCustomers_: CVRP::TNodesSet
-        -UnvisitedCustomers_: CVRP::TNodesSet
-        -RemainingCapacity_: int64_t
+        +TAnt(CVRP::TProblem)
+        +Reset()
+        +TotalDistance()
+        +GetRoutes()
+        +ConructSolution(TParameters, TPheromoneMatrix)
+        +MakeTwoOpt()
+        -VisitCustomer(CVRP::TNode)
+        -ReturnToDepot()
+        -SelectNextCustomer(..)
+        -CVRP::TProblem Problem
+        -CVRP::TRoutes Routes
+        -CVRP::TNodesSet VisitedCustomers
+        -CVRP::TNodesSet UnvisitedCustomers
+        -int64_t RemainingCapacity_
     }
 
     class TPheromoneMatrix << (T,#FF7700) >> {

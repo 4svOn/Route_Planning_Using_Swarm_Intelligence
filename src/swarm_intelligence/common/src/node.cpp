@@ -47,14 +47,14 @@ namespace SI::CVRP {
     TNodesWithCoordinates::TNodesWithCoordinates(const pb::Request& request_pb) {
         Nodes_.reserve(request_pb.customers().size() + 1);
         Coordinates_.reserve(request_pb.customers().size() + 1);
-        UIDFromFrontend_.reserve(request_pb.customers().size() + 1);
+        UIDsFromFrontend_.reserve(request_pb.customers().size() + 1);
         Nodes_.emplace_back(request_pb.depot(), 0);
         Coordinates_.emplace_back(request_pb.depot().coordinate());
-        UIDFromFrontend_.emplace_back(request_pb.depot().uid());
+        UIDsFromFrontend_.emplace_back(request_pb.depot().uid());
         for (int i = 0; i < request_pb.customers().size(); ++i) {
             Nodes_.emplace_back(request_pb.customers()[i], i + 1);
             Coordinates_.emplace_back(request_pb.customers()[i].coordinate());
-            UIDFromFrontend_.emplace_back(request_pb.customers()[i].uid());
+            UIDsFromFrontend_.emplace_back(request_pb.customers()[i].uid());
         }
     }
 
@@ -67,7 +67,7 @@ namespace SI::CVRP {
     }
 
     const std::vector<int64_t>& TNodesWithCoordinates::UIDsFromFrontend() const {
-        return UIDFromFrontend_;
+        return UIDsFromFrontend_;
     }
 
     const TNode& TNodesWithCoordinates::Node(int64_t index) const {
@@ -79,7 +79,7 @@ namespace SI::CVRP {
     }
 
     int64_t TNodesWithCoordinates::UIDFromFrontend(int64_t index) const {
-        return UIDFromFrontend_[index];
+        return UIDsFromFrontend_[index];
     }
     // ---------------------------------------------------------------------------------
 } // namespace SI::CVRP

@@ -1,4 +1,7 @@
 @startuml
+
+title HTTP interactions
+
 ' skinparam nodesep 5
 ' skinparam ranksep 15
 ' left to right direction

@@ -27,7 +27,7 @@ export class MarkerManager {
   }
 
   // Функция для форматирования адреса
-  formatAddress(address) {
+  _formatAddress(address) {
     const parts = [];
     if (address.house_number) parts.push(address.house_number);
     if (address.road) parts.push(address.road);
@@ -59,7 +59,7 @@ export class MarkerManager {
 
       // Форматируем адрес
       if (data.address && data.address !== ' ') {
-        this.addressesMap.set(uid, this.formatAddress(data.address));
+        this.addressesMap.set(uid, this._formatAddress(data.address));
       } else {
         this.addressesMap.set(uid, 'Адрес не найден');
       }
@@ -80,12 +80,14 @@ export class MarkerManager {
       address = 'Обработка адреса...'
     }
 
+    const isDepot = feature.get('markerType') === 'depot';
+
     const inputID = `marker-demand-${feature.get('uid')}`;
     // не работает, нужно отдельное хранилище для значений((((
-    const value = this.demandsMap.has(feature.get('uid')) ? this.demandsMap.get(feature.get('uid')) : (feature.get('markerType') === 'depot' ? '100' : '50');
+    const value = this.demandsMap.has(feature.get('uid')) ? this.demandsMap.get(feature.get('uid')) : (isDepot ? '100' : '50');
     const inputHolderHTML = `
       <div class="markers-list-number-input-container">
-        <span class="markers-list-number-input-label">${feature.get('markerType') === 'depot' ? 'Capacity' : 'Demand'}:</span>
+        <span class="markers-list-number-input-label">${isDepot ? 'Capacity' : 'Demand'}:</span>
         <input type="number" id="${inputID}" class="markers-list-number-input" inputmode="numeric" pattern="\d*" placeholder="Input a number" value="${value}" ${isClickable ? '' : 'disabled'}>
       </div}>
       </div>
@@ -95,7 +97,7 @@ export class MarkerManager {
       <div>
         <div class="list-content-wrapper">
           <div class="list-title-line-wrapper">
-            <strong id="list-title-${feature.get('uid')}">${title}</strong>
+            <strong id="list-title-${feature.get('uid')}" ${isDepot ? 'style="font-size: 20px"' : ''}>${title}</strong>
           </div>
           <div class="list-content-address">${address}</div>
           ${inputHolderHTML}

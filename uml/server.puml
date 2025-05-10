@@ -1,0 +1,55 @@
+@startuml
+
+title Server architecture
+
+' left to right direction
+top to bottom direction
+
+package "Request Handler" {
+  [ReqestHandler]
+}
+
+package "Core Libraries" {
+  [Proto]
+  [Base]
+}
+
+package "OSRM Client" {
+  [OSRM Client] as OSRM
+}
+
+package "Swarm Intelligence" {
+  [SI_Common] as SI_Common
+  [ACO] as ACO
+  [PSO] as PSO
+}
+
+cloud {
+  [Protobuf_LIB] as Protobuf_LIB
+  [userver::core] as userver_core
+}
+
+ReqestHandler -up-> ACO
+ReqestHandler -up-> PSO
+ReqestHandler -right-> OSRM
+ReqestHandler -up-> SI_Common
+ReqestHandler -down-> Proto
+ReqestHandler -down-> Base
+
+
+OSRM -down-> Base
+OSRM -down-> SI_Common
+
+SI_Common -right-> Base
+
+ACO -right-> SI_Common
+ACO -right-> Base
+
+PSO -right-> SI_Common
+PSO -right-> Base
+
+Proto .down.> Protobuf_LIB
+OSRM .down.> userver_core
+ReqestHandler .down.> userver_core
+
+@enduml

@@ -4,48 +4,59 @@ title PSO Component Class Diagram
 
 skinparam nodesep 50
 skinparam ranksep 80
-set separator none
+' set separator none
+skinparam linetype ortho
+
 
 
 namespace SI::PSO {
 
 class TParticle {
   + TParticle(CVRP::TProblem)
-  + TParticle(CVRP::TProblem, vector<TCoordinate>)
-  + TotalDistance() : TDistance
-  + GetRoutes() : CVRP::TRoutes
-  + Evaluate() : TDistance
-  + BestDistance() : TDistance
-  + BestPosition() : vector<TCoordinate>
+  + TParticle(CVRP::TProblem, TCoordinates)
+  + TotalDistance()
+  + GetRoutes()
+  + Evaluate()
+  + BestDistance()
+  + BestPosition()
   + Update(TParameters, TDistance)
-  - Problem_ : CVRP::TProblem
-  - Routes_ : CVRP::TRoutes
-  - Position_ : vector<TCoordinate>
-  - Velocity_ : vector<TCoordinate>
-  - BestPosition_ : vector<TCoordinate>
-  - BestDistance_ : TDistance
+  + MakeTwoOpt()
+  {static} MakeTwoOpt(CVRP::TProblem, TCoordinates)
+  - CVRP::TProblem Problem_
+  - CVRP::TRoutes Routes
+  - TCoordinates Position
+  - TCoordinates Velocity
+  - TCoordinates BestPosition
+  - TDistance BestDistance
 }
 
 class TSolver {
   + TSolver(CVRP::TProblem, TParameters)
-  + Solve() : CVRP::TSolution
-  + GetBestDistance() : TDistance
-  - ConstructBestRoutes() : CVRP::TRoutes
-  - Problem_ : CVRP::TProblem
-  - Parameters_ : TParameters
-  - Particles_ : vector<TParticle>
-  - BestPosition_ : vector<TCoordinate>
-  - BestDistance_ : TDistance
+  + CVRP::TSolution Solve()
+  + GetBestDistance()
+  - ConstructBestRoutes()
+  - CVRP::TProblem Problem
+  - TParameters Parameters
+  - vector<TParticle> Particles
+  - TCoordinates BestPosition
+  - TDistance BestDistance
 }
 
 class TParameters {
-  + SwarmSize : int64_t = 25
-  + MaxIterations : int64_t = 10000
-  + W : TCoordinate = 0.6
-  + C1 : TCoordinate = 1.5
-  + C2 : TCoordinate = 1.5
+  + SwarmSize  = 25
+  + MaxIterations = 10000
+  + W = 0.6
+  + C1 = 1.5
+  + C2 = 1.5
+}
+
+class TCoordinates<< (T,#FF7700) >> {
+  ..std::vector<int32_t>..
 }
 
 TSolver "1" *-- "1" TParameters : uses >
 TSolver "1" *-- "1..*" TParticle : manages >
+TParticle "1" *-- "1" TCoordinates : maintains >
+
+
 }
