@@ -4,6 +4,7 @@
 #include "util.hpp"
 
 #include <swarm_intelligence/common/CVRP_problem.hpp>
+#include <swarm_intelligence/common/node.hpp>
 
 #include <vector>
 
@@ -15,14 +16,15 @@ namespace SI::PSO {
         TDistance GetBestDistance() const;
 
     private:
-        CVRP::TRoutes ConstructBestRoutes() const;
-
-    private:
         const CVRP::TProblem& Problem_;
         TParameters Parameters_;
 
         std::vector<TParticle> Particles_;
+
+        CVRP::TRoutes BestRoutes_;
         TCoordinates BestPosition_;
         TDistance BestDistance_;
+
+        double W_STEP_;
     };
 }

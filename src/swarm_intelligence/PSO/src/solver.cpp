@@ -12,6 +12,7 @@ namespace SI::PSO {
     TSolver::TSolver(const CVRP::TProblem& problem, const TParameters& parameters)
         : Problem_(problem)
         , Parameters_(parameters)
+        , W_STEP_((TParameters::MAX_W - TParameters::MIN_W) / static_cast<double>(Parameters_.MaxIterations))
     {
         Particles_.reserve(Parameters_.SwarmSize);
         for (int i = 0; i < Parameters_.SwarmSize; ++i) {
@@ -30,13 +31,17 @@ namespace SI::PSO {
                 if (particle.BestDistance() < BestDistance_ || BestPosition_.empty()) {
                     BestDistance_ = particle.BestDistance();
                     BestPosition_ = particle.BestPosition();
+                    BestRoutes_ = particle.BestRoutes();
                     countSameResult = 0;
                 } else {
                     countSameResult++;
                 }
             }
-            BestDistance_ = TParticle::MakeTwoOpt(Problem_, BestPosition_, BestDistance_);
+            BestDistance_ = TParticle::MakeTwoOpt(Problem_, BestRoutes_, BestDistance_);
 
+            Parameters_.W -= W_STEP_;
+            Parameters_.C1 = (1. - Parameters_.W) * RandomUniform();
+            Parameters_.C2 = 1. - Parameters_.W - Parameters_.C1;
             for (auto& particle : Particles_) {
                 particle.Update(Parameters_, BestPosition_);
             }
@@ -46,17 +51,6 @@ namespace SI::PSO {
             }
         }
 
-        return {Problem_, ConstructBestRoutes(), BestDistance_};
-    }
-
-    TDistance TSolver::GetBestDistance() const {
-        return BestDistance_;
-    }
-
-    CVRP::TRoutes TSolver::ConstructBestRoutes() const {
-        TParticle particle{Problem_, BestPosition_};
-        TDistance distance = particle.Evaluate();
-        assert(abs(distance - BestDistance_) < 0.0000001);
-        return particle.GetRoutes();
+        return {Problem_, BestRoutes_, BestDistance_};
     }
 }

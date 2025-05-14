@@ -24,23 +24,29 @@ namespace SI::PSO {
         TDistance Evaluate();
         TDistance BestDistance() const;
         const TCoordinates& BestPosition() const;
+        const CVRP::TRoutes& BestRoutes() const;
 
         void MakeTwoOpt();
 
         void Update(const TParameters& parameters, const TCoordinates& bestGlobalPosition, bool isDebugPrint = false);
         void DebugPrint(std::ostream& stream);
 
-        static TDistance MakeTwoOpt(const CVRP::TProblem& problem, TCoordinates& position, TDistance oldBestDistance);
+        static TDistance MakeTwoOpt(const CVRP::TProblem& problem, CVRP::TRoutes& routes, TDistance oldBestDistance);
 
     private:
         void InsertSegment(const TCoordinates& source, size_t start, size_t end);
         void Repair();
 
+        void UpdateBestPosition();
+
     private:
         const CVRP::TProblem& Problem_;
+
         CVRP::TRoutes Routes_; // Routes for multiple vehicles
         TCoordinates Position_;
-        TCoordinates Velocity_;
+        TDistance TotalDistance_;
+
+        CVRP::TRoutes BestRoutes_;
         TCoordinates BestPosition_;
         TDistance BestDistance_; // Best total distance for this particle
         int64_t IterationsWithoutImprovement_;
