@@ -89,7 +89,7 @@ namespace SI::ACO {
         const auto& curNode = Routes_.back().back();
         std::vector <double> probabilities;
         for (const auto& customer : feasibleCustomers) {
-            double q = std::pow(pheromones[curNode.ID][Problem_.Depot().ID], parameters.PheromonceImportance);
+            double q = std::pow(pheromones[curNode.ID][customer.ID], parameters.PheromonceImportance);
             q *= std::pow(1. / static_cast<double>(Problem_.Distance(curNode, customer)), parameters.DistanceImportance);
             // {
             //     double toDepot = static_cast<double>(Problem_.Distance(curNode, Problem_.Depot()));
@@ -103,7 +103,8 @@ namespace SI::ACO {
         }
 
         if (RandomUniform() < parameters.ProbabalisticBorder) {
-            return *std::next(feasibleCustomers.begin(), std::max_element(probabilities.begin(), probabilities.end()) - probabilities.begin());
+            auto q = *std::next(feasibleCustomers.begin(), std::max_element(probabilities.begin(), probabilities.end()) - probabilities.begin());
+            return q;
         }
 
         std::for_each(probabilities.begin(), probabilities.end(), [&sum](double& p) { p /= sum; });

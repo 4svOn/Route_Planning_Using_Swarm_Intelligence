@@ -245,6 +245,7 @@ int main(int argc, char* argv[]) {
             SI::ACO::TParameters acoParameters;
             // acoParameters.AntsPerIteration = reader.Dimension * 2;
             acoParameters.AntsPerIteration = std::max(static_cast<int64_t>(100), reader.Dimension);
+            acoParameters.EvaporateRate = acoParameters.DepositRate / static_cast<double>(acoParameters.AntsPerIteration);
 
             SI::PSO::TParameters psoParameters;
             // psoParameters.SwarmSize = reader.Dimension * 2;

@@ -23,6 +23,7 @@ namespace SI::ACO {
                     bestDistanceInIteration = Ants_.back().TotalDistance();
                     bestAntIndexInIteration = Ants_.size() - 1;
                 }
+                // EvaporatePheromones(Ants_.back());
             }
 
             for (int64_t j = 0; j < Parameters_.AntsPerIteration; ++j) {
@@ -85,10 +86,10 @@ namespace SI::ACO {
 
     // global update
     void TSolver::DepositPheromones(const TAnt& ant) {
-        double delta = Parameters_.EvaporateRate / ant.TotalDistance();
+        double delta = Parameters_.DepositRate / ant.TotalDistance();
         for (const auto& route : ant.GetRoutes()) {
             for (size_t i = 0; i < route.size() - 1; ++i) {
-                Pheromones_[route[i].ID][route[i + 1].ID] *= (1. - Parameters_.EvaporateRate);
+                Pheromones_[route[i].ID][route[i + 1].ID] *= (1. - Parameters_.DepositRate);
                 Pheromones_[route[i].ID][route[i + 1].ID] += delta;
             }
         }
